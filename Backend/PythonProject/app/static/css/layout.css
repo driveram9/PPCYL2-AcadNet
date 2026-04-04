@@ -1,3 +1,65 @@
 body {
-background-color: peru;
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+nav {
+    background: #007BFF;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a {
+    margin-right: 15px;
+    text-decoration: none;
+    color: white;
+    background: #0056b3;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+nav .logo {
+    color: white;
+    font-weight: bold;
+}
+
+.login-box {
+    width: 300px;
+    margin: 80px auto;
+    padding: 20px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.login-box .icon {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.login-box h2 {
+    margin-bottom: 20px;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.login-box button {
+    width: 100%;
+    padding: 10px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }

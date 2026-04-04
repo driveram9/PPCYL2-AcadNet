@@ -1,15 +1,18 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for ('static', filename = 'css./layout.css')}}">
+    <title>{{ data.Titulo if data else "AcadNet" }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
 </head>
 <body>
-    {% block body %}
-    {% endblock %}
-
-
+    <nav>
+        <a href="/">Inicio</a>
+        <a href="/contacto/Juan/25">Contacto</a>
+        <a href="/query_string">Query</a>
+        <span class="logo">PPCYL2-AcadNet_Backend</span>
+    </nav>
+    <hr>
+    {% block content %}{% endblock %}
 </body>
 </html>

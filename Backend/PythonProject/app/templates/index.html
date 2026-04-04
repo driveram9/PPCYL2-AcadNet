@@ -1,14 +1,16 @@
-{% extends './layout.html' %}
-{% block title %} {{data.title}} {% endblock %}
- {% block body %}
- <h1>{{ data.bienvenida }}</h1>
-    {% if data.numero_cursos>0%}
-<ul> {% for c in data.cursos %}
-        <li>{{ c }}</li>
-        {% endfor %}
-    {% else %}
-</ul>
+{% extends "layout.html" %}
+{% block content %}
+<div class="login-box">
+    <div class="icon">&#128100;</div>
+    <h2>LOGIN</h2>
+    <form action="/login" method="post">
+        <label for="usuario">Usuario</label>
+        <input type="text" id="usuario" name="usuario" required>
 
-    <h2> Sin cursos asignados<\h2>
-        {% endif %}
+        <label for="contrasenia">Contraseña</label>
+        <input type="password" id="contrasenia" name="contrasenia" required>
+
+        <button type="submit">Iniciar Sesión</button>
+    </form>
+</div>
 {% endblock %}

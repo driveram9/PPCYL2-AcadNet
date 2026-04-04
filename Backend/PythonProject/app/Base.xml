@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<datos_personales>
+    <personas>
+        <usuario id="0">
+            <nombre>JuanPablo</nombre>
+            <rol>administrador</rol>
+            <login>AdminPPCYL2</login>
+            <contrasenia>AdminPPCYL2771</contrasenia>
+        </usuario>
+        <usuario id="1">
+            <nombre>Alejandro</nombre>
+            <rol>tutor</rol>
+            <login>Tutor1</login>
+            <contrasenia>Tutor1*</contrasenia>
+        </usuario>
+        <usuario id="2">
+            <nombre>Genesis</nombre>
+            <rol>estudiante</rol>
+            <login>Estudiante1</login>
+            <contrasenia>Estudiante1*</contrasenia>
+        </usuario>
+    </personas>
+</datos_personales>

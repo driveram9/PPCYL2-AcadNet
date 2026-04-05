@@ -59,6 +59,7 @@ def validar_login(usuario, contrasenia):#Validar las credenciales si son validas
 
 @app.route("/")
 def index():
+    session.clear()
     if session.get("usuario_rol"):#Extraer el Rol correspondiente de cada usuario
         rol = session.get("usuario_rol") #Rol asignado a la variable rol
         if rol == "administrador": #Validacion de rol de administrador

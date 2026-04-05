@@ -110,15 +110,15 @@ def login():
 
 
 
-@app.route("/admin")
+@app.route("/admin") #Te dirige a la pagina asignada a administradores
 def admin_dashboard():
     return render_template("admin.html")
 
-@app.route("/tutor")
+@app.route("/tutor")#Te dirige a la pagina asignada a tutores
 def tutor_dashboard():
     return render_template("tutor.html")
 
-@app.route("/estudiante")
+@app.route("/estudiante")#Te dirige a la pagina asignada a estudiantes
 def estudiante_dashboard():
     return render_template("estudiante.html")
 

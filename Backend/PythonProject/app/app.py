@@ -114,6 +114,13 @@ def login():
 def admin_dashboard():
     return render_template("admin.html")
 
+@app.route("/tutor")
+def tutor_dashboard():
+    return render_template("tutor.html")
+
+@app.route("/estudiante")
+def estudiante_dashboard():
+    return render_template("estudiante.html")
 
 
 if __name__ == '__main__':

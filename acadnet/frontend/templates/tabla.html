@@ -1,10 +1,36 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Tabla</title>
+    <link rel="stylesheet" href="{% static 'css/tabla.css' %}">
 </head>
 <body>
+
+<div class="container">
+    <h1>Tabla de Estudiantes</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Carnet</th>
+                <th>Nombre</th>
+                <th>Curso</th>
+                <th>Nota</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for estudiante in estudiantes %}
+            <tr>
+                <td>{{ estudiante.carnet }}</td>
+                <td>{{ estudiante.nombre }}</td>
+                <td>{{ estudiante.curso }}</td>
+                <td>{{ estudiante.nota }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 </body>
 </html>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuraciones>
+    <cursos>
+        <curso codigo="101">Matemáticas</curso>
+        <curso codigo="102">Historia</curso>
+        <curso codigo="103">Programación</curso>
+    </cursos>
+
+    <tutores>
+        <tutor registro_personal="T001" contrasenia="abc123">Alejandro</tutor>
+        <tutor registro_personal="T002" contrasenia="xyz789">María</tutor>
+    </tutores>
+
+    <estudiantes>
+        <estudiante carnet="E001" contrasenia="pass1">Genesis</estudiante>
+        <estudiante carnet="E002" contrasenia="pass2">Luis</estudiante>
+        <estudiante carnet="E003" contrasenia="pass3">Ana</estudiante>
+    </estudiantes>
+
+    <asignaciones>
+        <c_tutores>
+            <tutor_curso codigo="101">T001</tutor_curso>
+            <tutor_curso codigo="102">T001</tutor_curso>
+            <tutor_curso codigo="103">T002</tutor_curso>
+        </c_tutores>
+
+        <c_estudiante>
+            <estudiante_curso codigo="101">E001</estudiante_curso>
+            <estudiante_curso codigo="101">E002</estudiante_curso>
+            <estudiante_curso codigo="102">E003</estudiante_curso>
+        </c_estudiante>
+    </asignaciones>
+</configuraciones>

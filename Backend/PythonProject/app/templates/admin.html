@@ -1,4 +1,35 @@
+
 {% extends "layout.html" %}
 {% block content %}
-    <h2>Funciones de admin*</h2>
+<h2>Panel de Administración</h2>
+
+<!-- Botones principales -->
+<form action="/admin" method="post" enctype="multipart/form-data">
+    <h3>CARGA DE ARCHIVOS</h3>
+    <input type="file" name="archivo" accept=".xml">
+    <button type="submit" name="accion" value="cargar">Cargar Archivo</button>
+    <button type="submit" name="accion" value="procesar">Procesar Datos</button>
+    <button type="submit" name="accion" value="limpiar">Limpiar Datos</button>
+
+    <br><br>
+    <textarea name="xml_texto" rows="15" cols="80">{{ xml }}</textarea>
+</form>
+
+<!-- Área de salida -->
+<h3>SALIDA</h3>
+<textarea rows="15" cols="80" readonly>{{ salida }}</textarea>
 {% endblock %}
+<h3>Cursos cargados</h3>
+
+#ARCHIVO DE SALIDA ADMIN**********************************************************************
+<h2>Panel de Administración</h2>
+
+<form action="/admin/procesar" method="post">
+    <textarea name="xml_texto" rows="15" cols="80">{{ xml }}</textarea><br>
+    <button type="submit">Procesar</button>
+</form>
+
+{% if salida %}
+<h3>Archivo de Salida</h3>
+<textarea rows="15" cols="80" readonly>{{ salida }}</textarea>
+{% endif %}

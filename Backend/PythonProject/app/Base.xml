@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<datos_personales>
-    <personas>
-        <usuario id="0">
-            <nombre>JuanPablo</nombre>
-            <rol>administrador</rol>
-            <login>AdminPPCYL2</login>
-            <contrasenia>AdminPPCYL2771</contrasenia>
-        </usuario>
-        <usuario id="1">
-            <nombre>Alejandro</nombre>
-            <rol>tutor</rol>
-            <login>Tutor1</login>
-            <contrasenia>Tutor1*</contrasenia>
-        </usuario>
-        <usuario id="2">
-            <nombre>Genesis</nombre>
-            <rol>estudiante</rol>
-            <login>Estudiante1</login>
-            <contrasenia>Estudiante1*</contrasenia>
-        </usuario>
-    </personas>
-</datos_personales>
+<configuracion>
+    <cursos>
+        <curso codigo="MAT101">Matemáticas</curso>
+        <curso codigo="FIS201">Física</curso>
+    </cursos>
+
+    <tutores>
+        <tutor registro_personal="T001" contrasenia="Tutor1*">Carlos</tutor>
+        <tutor registro_personal="T002" contrasenia="Tutor2*">María</tutor>
+    </tutores>
+
+    <estudiantes>
+        <estudiante carnet="E001" contrasenia="Estudiante1*">Ana</estudiante>
+        <estudiante carnet="E002" contrasenia="Estudiante2*">Luis</estudiante>
+    </estudiantes>
+
+    <asignaciones>
+        <c_tutores>
+            <tutor_curso codigo="MAT101">T001</tutor_curso>
+            <tutor_curso codigo="FIS201">T999</tutor_curso> <!-- incorrecto -->
+        </c_tutores>
+        <c_estudiante>
+            <estudiante_curso codigo="MAT101">E001</estudiante_curso>
+            <estudiante_curso codigo="MAT101">E999</estudiante_curso> <!-- incorrecto -->
+        </c_estudiante>
+    </asignaciones>
+</configuracion>

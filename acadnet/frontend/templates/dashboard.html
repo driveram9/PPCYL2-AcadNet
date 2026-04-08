@@ -1,2 +1,71 @@
-<h1>Bienvenido</h1>
-<p>Login exitoso</p>
+{% load static %}
+<link rel="stylesheet" href="{% static 'CSS/Dashboard.css' %}">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="Dashboard.css" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <section id="sidebar">
+        <a href="#" class="brand">
+            <i class='bx bx-badge-check'></i>
+            <span class="text">Estudiante</span>
+        </a>
+        <ul class="side-menu top">
+            <li class="active">
+                <a href="#">
+                    <i class="bx bxs-dashboard"></i>
+                    <span class="text">Cursos</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bx bx-book-content"></i>
+                    <span class="text">Tareas Pendientes</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bx bx-pencil"></i>
+                    <span class="text">Notas</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bx-bell'></i>
+                    <span class="text">Anuncios</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bx bx-calendar-check"></i>
+                    <span class="text">Horario</span></i>
+                </a>
+            </li>
+        </ul>
+        <ul class="side-menu">
+            <li>
+                <a href="#">
+                    <i class="bx bx-cog"></i>
+                    <span class="text">Configuraciones</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bx bx-right-arrow-alt"></i>
+                    <span class="text">Cerrar seción</span>
+                </a>
+            </li>
+        </ul>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>

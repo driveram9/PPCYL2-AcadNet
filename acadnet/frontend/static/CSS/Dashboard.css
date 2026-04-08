@@ -1,1 +1,114 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap");
 
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+}
+
+li {
+    list-style: none;
+}
+
+:root {
+    --poppins: "Poppins", sans-serif;
+    --lato: "Lato", sans-serif;
+    --light: #F9F9F9;
+    --blue: #3C91E6;
+    --light-blue: #CFE8FF;
+    --grey: #eee;
+    --dark-grey: #AAAAAA;
+    --dark: #342E37;
+    --red: #DB504A;
+    --yellow: #FFCE26
+    --light-yellow: #FFF2C6
+    --orange: #FD7238;
+    --light-orange: #FFE0D3
+}
+
+body {
+    background: var(--grey);
+}
+
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100%;
+    background: blue;
+    z-index: 1000;
+    font-family: var(--lato);
+}
+#sidebar .brand {
+    font-size: 24px;
+    font-weight: 700;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    color: var(--light-blue);
+}
+#sidebar .brand .bx {
+    min-width: 60px;
+    display: flex;
+    justify-content: center;
+}
+#sidebar .side-menu {
+    width: 100%;
+    margin-top: 48px;
+}
+#sidebar .side-menu li {
+    height: 48px;
+    background: transparent;
+    margin-left: 6px;
+    border-radius: 48px 0 0 48px;
+    padding: 4px;
+}
+#sidebar .side-menu li.active {
+    background: var(--grey);
+    position: relative;
+}
+#sidebar .side-menu li.active::before {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    top: -40px;
+    right: 0;
+    box-shadow: 20px 20px 0 var(--grey);
+    z-index: -1;
+}
+#sidebar .side-menu li.active::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    bottom: -40px;
+    right: 0;
+    box-shadow: 20px -20px 0 var(--grey);
+    z-index: -1;
+}
+#sidebar .side-menu li a {
+    width: 100%;
+    height: 100%;
+    background: blue;
+    display: flex;
+    align-items: center;
+    border-radius: 48px;
+    font-size: 16px;
+    color: var(--light);
+}
+#sidebar .side-menu.top li a:hover {
+    color: black;
+}
+#sidebar .side-menu.top li a .bx {
+    min-width: calc(60px - ((4px + 6px)*2));
+    display: flex;
+    justify-content: center;
+}

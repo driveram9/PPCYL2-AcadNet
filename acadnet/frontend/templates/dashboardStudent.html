@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="{% static 'css/DashboardStudent.css' %}">
+
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <section id="sidebar">
+        <a href="#" class="brand">
+            <i class='bx bx-badge-check'></i>
+            <span class="text">Estudiante</span>
+        </a>
+
+        <ul class="side-menu top">
+            <li class="active">
+                <a href="#">
+                    <i class="bx bxs-dashboard"></i>
+                    <span class="text">Cursos</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class="bx bx-book-content"></i>
+                    <span class="text">Tareas Pendientes</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class="bx bx-pencil"></i>
+                    <span class="text">Notas</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class='bx bx-bell'></i>
+                    <span class="text">Anuncios</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class="bx bx-calendar-check"></i>
+                    <span class="text">Horario</span>
+                </a>
+            </li>
+        </ul>
+
+        <ul class="side-menu">
+            <li>
+                <a href="#">
+                    <i class="bx bx-cog"></i>
+                    <span class="text">Configuraciones</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class="bx bx-right-arrow-alt"></i>
+                    <span class="text">Cerrar sesión</span>
+                </a>
+            </li>
+        </ul>
+    </section>
+
+    <section id="content">
+        <nav>
+            <i class='bx bx-menu'></i>
+            <span class="dashboard-title">Panel Estudiantil | </span>
+            <span class="user">Bienvenido</span>
+        </nav>
+
+        <main>
+            <div id="cursos" class="section">
+                <h3>Cursos</h3>
+                <ul>
+                    <li>Matemáticas Avanzadas</li>
+                    <li>Programación en Python</li>
+                    <li>Física Aplicada</li>
+                </ul>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <h3>Tareas</h3>
+                    <p>5 pendientes</p>
+                </div>
+            </div>
+            <div id="tareas" class="section" style="dlisplay:none;">
+                <h3>Tareas Pendientes</h3>
+                <ul>
+                    <li>Ejercicios de Álgebra (Entrega: 10/04)</li>
+                    <li>Proyecto Django (Entrega: 15/04)</li>
+                    <li>Informe de Física (Entrega: 20/04)</li>
+                </ul>
+            </div>
+            <div id="notas" class="section" style="display:none;">
+                <h3>Notas</h3>
+                <p>Álgebra Superior: 85</p>
+                <p>Programación Para la Ciencia y la Ingeniería: 90</p>
+                <p>Física I: 78</p>
+                <p><strong>Promedio General: 84.3</strong></p>
+            </div>
+            <div id="anuncios" class="section" style="dlisplay:none;">
+                <h3>Anuncios</h3>
+                <ul>
+                    <li>📢 Examen de Algebra Superior el 12/04</li>
+                    <li>📢 Taller de Django el 14/04</li>
+                    <li>📢 No hay clases el 18/04</li>
+                </ul>
+            </div>
+            <div id="horario" class="section" style="display:none;">
+                <h3>Horario</h3>
+                <table>
+                    <tr><th>Día</th><th>Curso</th><th>Hora</th></tr>
+                    <tr><td>Lunes</td><td>Algebra Superior</td><td>8:00 - 10:00</td></tr>
+                    <tr><td>Martes</td><td>Programación Para la Ciencia y la Ingeniería I</td><td>10:00 - 12:00</td></tr>
+                    <tr><td>Miércoles</td><td>Física I</td><td>8:00 - 10:00</td></tr>
+                </table>
+            </div>
+        </main>
+    </section>
+
+    <script src="{% static 'js/dashboardStudent.js' %}"></script>
+
+</body>
+</html>

@@ -73,6 +73,63 @@
         </ul>
     </section>
 
+    <section id="content">
+        <nav>
+            <i class='bx bx-menu'></i>
+            <span class="dashboard-title">Panel Estudiantil | </span>
+            <span class="user">Bienvenido</span>
+        </nav>
+
+        <main>
+            <div id="cursos" class="section">
+                <h3>Cursos</h3>
+                <ul>
+                    <li>Matemáticas Avanzadas</li>
+                    <li>Programación en Python</li>
+                    <li>Física Aplicada</li>
+                </ul>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <h3>Tareas</h3>
+                    <p>5 pendientes</p>
+                </div>
+            </div>
+            <div id="tareas" class="section" style="dlisplay:none;">
+                <h3>Tareas Pendientes</h3>
+                <ul>
+                    <li>Ejercicios de Álgebra (Entrega: 10/04)</li>
+                    <li>Proyecto Django (Entrega: 15/04)</li>
+                    <li>Informe de Física (Entrega: 20/04)</li>
+                </ul>
+            </div>
+            <div id="notas" class="section" style="display:none;">
+                <h3>Notas</h3>
+                <p>Álgebra Superior: 85</p>
+                <p>Programación Para la Ciencia y la Ingeniería: 90</p>
+                <p>Física I: 78</p>
+                <p><strong>Promedio General: 84.3</strong></p>
+            </div>
+            <div id="anuncios" class="section" style="dlisplay:none;">
+                <h3>Anuncios</h3>
+                <ul>
+                    <li>📢 Examen de Algebra Superior el 12/04</li>
+                    <li>📢 Taller de Django el 14/04</li>
+                    <li>📢 No hay clases el 18/04</li>
+                </ul>
+            </div>
+            <div id="horario" class="section" style="display:none;">
+                <h3>Horario</h3>
+                <table>
+                    <tr><th>Día</th><th>Curso</th><th>Hora</th></tr>
+                    <tr><td>Lunes</td><td>Algebra Superior</td><td>8:00 - 10:00</td></tr>
+                    <tr><td>Martes</td><td>Programación Para la Ciencia y la Ingeniería I</td><td>10:00 - 12:00</td></tr>
+                    <tr><td>Miércoles</td><td>Física I</td><td>8:00 - 10:00</td></tr>
+                </table>
+            </div>
+        </main>
+    </section>
+
     <script src="{% static 'js/dashboardStudent.js' %}"></script>
 
 </body>

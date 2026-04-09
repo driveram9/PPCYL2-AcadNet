@@ -15,7 +15,7 @@ def login_view(request):
     return render(request, 'login.html')
 
 def dashboard_view(request):
-    return render(request, 'dashboard.html')
+    return render(request, 'dashboardStudent.html')
 
 def upload_view(request):
     return render(request, 'upload.html')

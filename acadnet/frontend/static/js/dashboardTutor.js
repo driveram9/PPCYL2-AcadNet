@@ -11,7 +11,7 @@ menuItems.forEach(item => {
 
         this.parentElement.classList.add('active');
 
-        const texto = this.querySelector('.text').textContent.toLowerCase();
+        const texto = this.querySelector('.text').textContent.toLowerCase().replace(" ","_");
         const target = document.getElementById(texto);
 
         if (target) target.style.display = 'block';

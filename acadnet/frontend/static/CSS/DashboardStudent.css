@@ -112,3 +112,12 @@ body {
     display: flex;
     justify-content: center;
 }
+#content {
+    position: relative;
+    width: calc(100%);
+    left: 300px;
+}
+#content nav {
+    height: 56px;
+    padding: 0 24px;
+}

@@ -5,8 +5,15 @@ def login_view(request):
         usuario = request.POST.get('usuario')
         contrasenia = request.POST.get('contrasenia')
 
-        if usuario == "admin" and contrasenia == "1234":
-            return redirect('dashboard')
+        if usuario == "student" and contrasenia == "1234":
+            return redirect('student')
+
+        elif usuario == "admin" and contrasenia == "1234":
+            return redirect('admin')
+
+        elif usuario == "tutor" and contrasenia == "1234":
+            return redirect('tutor')
+
         else:
             return render(request, 'login.html', {
                 'error': 'Usuario o contraseña incorrecta'
@@ -14,8 +21,14 @@ def login_view(request):
 
     return render(request, 'login.html')
 
-def dashboard_view(request):
+def dashboard_student(request):
     return render(request, 'dashboardStudent.html')
+
+def dashboard_admin(request):
+    return render(request, 'dashboardAdmin.html')
+
+def dashboard_tutor(request):
+    return render(request, 'dashboardTutor.html')
 
 def upload_view(request):
     return render(request, 'upload.html')
@@ -27,4 +40,10 @@ def tabla_view(request):
         {"carnet": "2023003", "nombre": "Carlos Ruiz", "curso": "Química", "nota": 78},
     ]
 
-    return render(request, 'tabla.html', {"estudiantes": estudiantes})
+def dashboard_tutor(request):
+    horarios = [
+        {"curso": "Matemática", "inicio": "09:40", "fin": "10:30"},
+        {"curso": "Física", "inicio": "10:30", "fin": "11:20"},
+        ]
+
+    return render(request, 'dashboardTutor.html', {"horarios": horarios})

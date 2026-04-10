@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Tutor</title>
+
+    <link rel="stylesheet" href="{% static 'css/dashboardTutor.css' %}">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<section id="sidebar">
+    <a href="#" class="brand">
+        <i class='bx bx-user'></i>
+        <span class="text">Tutor</span>
+    </a>
+
+    <ul class="side-menu top">
+
+        <li class="active">
+            <a href="#"><i class="bx bx-time"></i><span class="text">Horarios</span></a>
+        </li>
+
+        <li>
+            <a href="#"><i class="bx bx-upload"></i><span class="text">Cargar Horarios</span></a>
+        </li>
+
+        <li>
+            <a href="#"><i class="bx bx-edit"></i><span class="text">Ingreso Notas</span></a>
+        </li>
+
+        <li>
+            <a href="#"><i class="bx bx-table"></i><span class="text">Tabla</span></a>
+        </li>
+
+        <li>
+            <a href="#"><i class="bx bx-bar-chart"></i><span class="text">Reportes</span></a>
+        </li>
+
+    </ul>
+</section>
+
+<section id="content">
+    <main>
+
+        <div id="horarios" class="section">
+            <h3>Horarios</h3>
+            <p>Aquí podrás gestionar tus horarios.</p>
+        </div>
+
+        <div id="cargar horarios" class="section" style="display:none;">
+            <h3>Cargar Horarios XML</h3>
+            <input type="file">
+            <button>Subir</button>
+        </div>
+
+        <div id="ingreso notas" class="section" style="display:none;">
+            <h3>Ingreso de Notas</h3>
+            <input type="file">
+            <button>Subir XML</button>
+        </div>
+
+        <div id="tabla" class="section" style="display:none;">
+            <h3>Tabla de Horarios</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Curso</th>
+                        <th>Hora Inicio</th>
+                        <th>Hora Fin</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in horarios %}
+                    <tr>
+                        <td>{{ item.curso }}</td>
+                        <td>{{ item.inicio }}</td>
+                        <td>{{ item.fin }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="reportes" class="section" style="display:none;">
+            <h3>Reportes</h3>
+            <p>Aquí irán gráficos con ChartJS o Plotly.</p>
+        </div>
+
+    </main>
+</section>
+
+<script src="{% static 'js/dashboardTutor.js' %}"></script>
+
+</body>
+</html>

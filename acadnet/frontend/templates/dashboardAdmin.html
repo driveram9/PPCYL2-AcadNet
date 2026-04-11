@@ -5,16 +5,112 @@
     <title>Dashboard</title>
 </head>
 <body>
+    <section id="sidebar">
+        <a href="#" class="brand">
+            <i class='bx bx-badge-check'></i>
+            <span class="text">Administrador</span>
+        </a>
+        <ul class="side-menu top">
+            <li class="active">
+                <a href="#">
+                    <i class="bx bxs-dashboard"></i>
+                    <span class="text">Gestion de Cursos</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bx bx-book-content"></i>
+                    <span class="text">Tutores</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bx bx-pencil"></i>
+                    <span class="text">Estudiantes</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bx-bell'></i>
+                    <span class="text">Mensajes</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bx bx-calendar-check"></i>
+                    <span class="text">Fechas Importantes</span></i>
+                </a>
+            </li>
+        </ul>
+        <ul class="side-menu">
+            <li>
+                <a href="#">
+                    <i class="bx bx-cog"></i>
+                    <span class="text">Configuraciones</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bx bx-right-arrow-alt"></i>
+                    <span class="text">Cerrar seción</span>
+                </a>
+            </li>
+        </ul>
+    </section>
 
-<h1>Bienvenido 😎</h1>
+    <section id="content">
 
-<a href="/upload/">
-    <button>Subir XML</button>
-</a>
+        <main>
+            <div id="gestion de cursos" class="section">
+                <h3>Cursos Activos</h3>
+                <ul>
+                    <li>📘 Matemáticas Avanzadas – 45 estudiantes inscritos</li>
+                    <li>💻 Programación en Python – 60 estudiantes inscritos</li>
+                    <li>🔬 Física Aplicada – 40 estudiantes inscritos</li>
+                </ul>
+                <h3>Panel del Administrador</h3>
+                    <a href="/upload/">
+                        <button>Subir XML</button>
+                    </a>
 
-<a href="/tabla/">
-    <button>Ver Tabla</button>
-</a>
+                    <a href="/tabla/">
+                        <button>Ver Tabla</button>
+                    </a>
+            </div>
+            <div id="tutores" class="section" style="display:none;">
+                <h3>Lista de Tutores Actuales</h3>
+                <ul>
+                    <li> Ana López – Álgebra Superior</li>
+                    <li> Carlos Arias – Programación Para la Ciencia y la Ingeniería I</li>
+                    <li> María González – Física I</li>
+                </ul>
+            </div>
+            <div id="estudiantes" class="section" style="display:none;">
+                <h3>Lista de Estudiantes Actuales</h3>
+                <li> Laura Martínez – Álgebra Superior</li>
+                <li> Pedro Hernández – Programación Para la Ciencia y la Ingeniería I</li>
+                <li> Sofía Castillo – Física I</li>
+            </div>
+            <div id="mensajes" class="section" style="display:none;">
+                <h3>Mensajes Nuevos!!</h3>
+                <ul>
+                    <li>📢 Reunión de coordinación el lunes a las 9:00 AM</li>
+                    <li>📢 Actualización de la plataforma el miércoles</li>
+                    <li>📢 Entrega de reportes trimestrales antes del 20/04</li>
+                </ul>
+            </div>
+            <div id="fechas importantes" class="section" style="display:none;">
+                <h3>Fechas Importantes</h3>
+                <table>
+                    <tr><th>Evento</th><th>Fecha</th></tr>
+                    <tr><td>Inicio de inscripciones</td><td>15/04/2026</td></tr>
+                    <tr><td>Examen final de Matemáticas</td><td> 25/04/2026</td></tr>
+                    <tr><td>Cierre de ciclo académico</td><td>30/04/2026</td></tr>
+                </table>
+            </div>
+        </main>
+    </section>
+
 
 </body>
 </html>

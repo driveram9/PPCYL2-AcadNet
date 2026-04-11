@@ -40,7 +40,7 @@ body {
     left: 0;
     width: 280px;
     height: 100%;
-    background: blue;
+    background: var(--blue);
     z-index: 1000;
     font-family: var(--lato);
 }
@@ -50,7 +50,7 @@ body {
     height: 56px;
     display: flex;
     align-items: center;
-    color: var(--light-blue);
+    color: var(--dark);
 }
 #sidebar .brand .bx {
     min-width: 60px;
@@ -97,7 +97,7 @@ body {
 #sidebar .side-menu li a {
     width: 100%;
     height: 100%;
-    background: blue;
+    background: var(--blue);
     display: flex;
     align-items: center;
     border-radius: 48px;
@@ -111,10 +111,12 @@ body {
     min-width: calc(60px - ((4px + 6px)*2));
     display: flex;
     justify-content: center;
+}
 #content {
     position: relative;
-    width: calc(100%);
+    width: calc(100%-280%);
     left: 300px;
+    padding: 20px;
 }
 #content nav {
     height: 56px;
@@ -133,7 +135,7 @@ main {
     background: var(--light);
     border-radius: 10px;
     padding: 20px;
-    flex: 1 1 300px; /* se adaptan al ancho disponible */
+    flex: 1 1 300px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 .section h3 {
@@ -144,6 +146,8 @@ main {
 .section ul {
     margin-left: 20px;
     color: var(--dark);
+.section ul {
+    margin-left: 20px;
 }
 .section ul li {
     margin-bottom: 8px;
@@ -165,4 +169,24 @@ main {
 }
 .section {
     transition: all 0.3s ease-in-out;
+}
+main {
+    background: var(--light);
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 80vh;
+}
+button {
+    background: var(--blue);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--poppins);
+    transition: background 0.3s ease;
+}
+button:hover {
+    background: var(--dark);
 }

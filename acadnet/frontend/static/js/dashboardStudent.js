@@ -26,7 +26,9 @@ menuItems.forEach(item => {
         this.parentElement.classList.add('active');
 
         // Mostrar la sección correspondiente
-        const texto = this.querySelector('.text').textContent.toLowerCase();
+        const texto = this.querySelector('.text').textContent
+            .toLowerCase()
+            .replace(/\s+/g, '-');
         const target = document.getElementById(texto);
         if (target) target.style.display = 'block';
     });

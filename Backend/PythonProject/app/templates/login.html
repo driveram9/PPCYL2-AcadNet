@@ -1,33 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Login</title>
 </head>
 <body>
-    <h1>Pantalla de inicio</h1>
-
-     <!-- credenciales incorrectas -->
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul>
-          {% for message in messages %}
-            <li style="color:red;">
-              {{ message }}
-              <a href="{{ url_for('auth.login_form') }}">Volver a login</a>
-            </li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-
-    <!-- Formulario de login -->
-    <form method="POST" action="{{ url_for('auth.login') }}">
-        <label for="usuario">Usuario:</label>
-        <input type="text" name="usuario" id="usuario" required><br>
-
-        <label for="contrasenia">Contraseña:</label>
-        <input type="password" name="contrasenia" id="contrasenia" required><br>
-
+    <h1>Iniciar sesión</h1>
+    {% if mensaje %}
+        <p style="color:red;">{{ mensaje }}</p>
+    {% endif %}
+    <form method="POST">
+        <label>Usuario:</label>
+        <input type="text" name="usuario" required><br><br>
+        <label>Contraseña:</label>
+        <input type="password" name="contrasenia" required><br><br>
         <button type="submit">Ingresar</button>
     </form>
 </body>

@@ -2,8 +2,7 @@ from django.shortcuts import render, redirect
 import xml.etree.ElementTree as ET
 import os
 
-RUTA_XML = os.path.join(os.path.dirname(__file__),
-                        'registro.xml')  # Se asigna una variable para asignar la ruta de base de la datos
+RUTA_XML = os.path.join(os.path.dirname(__file__),'registro.xml')  # Se asigna una variable para asignar la ruta de base de la datos
 
 
 def cargar_usuarios():  # se crea una funcion para asignar los datos del XML

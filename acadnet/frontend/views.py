@@ -12,7 +12,7 @@ def login_view(request):
             return redirect('admin')
 
         elif usuario == "tutor" and contrasenia == "1234":
-            return redirect('dashboard_tutor')
+            return redirect('tutor')
 
         else:
             return render(request, 'login.html', {
@@ -21,7 +21,6 @@ def login_view(request):
 
     return render(request, 'login.html')
 
-
 def dashboard_student(request):
     return render(request, 'dashboardStudent.html')
 
@@ -29,15 +28,10 @@ def dashboard_admin(request):
     return render(request, 'dashboardAdmin.html')
 
 def dashboard_tutor(request):
-    horarios = [
-        {"curso": "Matemática", "inicio": "09:40", "fin": "10:30"},
-        {"curso": "Física", "inicio": "10:30", "fin": "11:20"},
-    ]
-    return render(request, 'dashboardTutor.html', {"horarios": horarios})
+    return render(request, 'dashboardTutor.html')
 
 def upload_view(request):
     return render(request, 'upload.html')
-
 
 def tabla_view(request):
     estudiantes = [
@@ -45,4 +39,11 @@ def tabla_view(request):
         {"carnet": "2023002", "nombre": "Ana López", "curso": "Física", "nota": 90},
         {"carnet": "2023003", "nombre": "Carlos Ruiz", "curso": "Química", "nota": 78},
     ]
-    return render(request, 'tabla.html', {"estudiantes": estudiantes})
+
+def dashboard_tutor(request):
+    horarios = [
+        {"curso": "Matemática", "inicio": "09:40", "fin": "10:30"},
+        {"curso": "Física", "inicio": "10:30", "fin": "11:20"},
+        ]
+
+    return render(request, 'dashboardTutor.html', {"horarios": horarios})

@@ -28,7 +28,7 @@ menuItems.forEach(item => {
         // Mostrar la sección correspondiente
         const texto = this.querySelector('.text').textContent
             .toLowerCase()
-            .replace(/\s+/g, '-');
+                .replace(/\s+/g, '-');
         const target = document.getElementById(texto);
         if (target) target.style.display = 'block';
     });

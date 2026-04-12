@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de archivo</title>
+    <style>
+        input[type="file"] { display: none; }
+        .boton-cargar {
+            background-color: #007BFF;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .boton-cargar:hover { background-color: #0056b3; }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        textarea {
+            width: 100%;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gestión de archivo</h1>
+
+    {% if mensaje %}
+        <p><strong>{{ mensaje }}</strong></p>
+    {% endif %}
+
+    <!-- Botones principales -->
+    <form method="POST" enctype="multipart/form-data">
+        <label for="archivo" class="boton-cargar">📂 Cargar archivo</label>
+        <input type="file" id="archivo" name="archivo" onchange="document.getElementById('cargarBtn').click()" />
+        <button type="submit" id="cargarBtn" name="action" value="cargar" style="display:none;"></button>
+        <button type="submit" name="action" value="procesar">⚙️ Procesar datos</button>
+        <button type="submit" name="action" value="limpiar">🗑️ Limpiar datos</button>
+    </form>
+
+    <!-- Botón de editar arriba -->
+    {% if contenido_xml and not salida.modo_edicion %}
+        <form method="POST" style="margin-top:10px;">
+            <button type="submit" name="action" value="modificar">✏️ Editar archivo</button>
+        </form>
+    {% endif %}
+
+    <!-- Editor arriba si está en modo edición -->
+    {% if salida.modo_edicion %}
+        <h2>Editar archivo completo</h2>
+        <form method="POST">
+            <textarea name="xml_editado" rows="20" cols="80">{{ contenido_xml }}</textarea>
+            <br>
+            <button type="submit" name="action" value="guardar">💾 Guardar cambios</button>
+        </form>
+    {% endif %}
+
+    <!-- Contenido y salida -->
+    {% if contenido_xml %}
+        <h2>Archivo de entrada</h2>
+        <pre>{{ contenido_xml }}</pre>
+    {% endif %}
+
+    {% if salida.salida_xml %}
+        <h2>Archivo de salida</h2>
+        <pre>{{ salida.salida_xml }}</pre>
+    {% endif %}
+
+    <a href="{{ url_for('admin.admin_dashboard') }}">⬅️ Volver al Dashboard</a>
+</body>
+</html>

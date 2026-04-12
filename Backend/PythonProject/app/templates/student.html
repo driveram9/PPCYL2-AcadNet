@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Estudiante</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            padding: 20px;
+        }
+        .top-left {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .top-left a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .top-left a:hover {
+            text-decoration: underline;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 80px auto 0 auto; /* espacio para el link arriba */
+        }
+        h1 {
+            color: #007BFF;
+            text-align: center;
+        }
+        p {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Link en la esquina superior izquierda -->
+    <div class="top-left">
+        <a href="{{ url_for('auth.login_form') }}">⬅️ Login</a>
+    </div>
+
+    <div class="card">
+        <h1>Bienvenido Estudiante</h1>
+        <p><strong>Nombre:</strong> {{ nombre }}</p>
+        <p><strong>Carnet:</strong> {{ carnet }}</p>
+        <p><strong>Repositorio:</strong>
+            <a href="https://github.com/tu-repo" target="_blank">Link de repositorio</a>
+        </p>
+    </div>
+</body>
+</html>

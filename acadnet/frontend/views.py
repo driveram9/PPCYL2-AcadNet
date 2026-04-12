@@ -2,14 +2,11 @@ from django.shortcuts import render, redirect
 import xml.etree.ElementTree as ET
 import os
 
-# Ruta del XML (MISMA carpeta que views.py)
+# Ruta del XML
 RUTA_XML = os.path.join(os.path.dirname(__file__), 'registro.xml')
 
 
 def cargar_datos():
-    print("Ruta XML:", RUTA_XML)
-    print("¿Existe?:", os.path.exists(RUTA_XML))
-
     if not os.path.exists(RUTA_XML):
         return None
 
@@ -52,6 +49,9 @@ def cargar_datos():
     return datos
 
 
+# ==============================
+# LOGIN
+# ==============================
 def login_view(request):
     if request.method == 'POST':
         usuario = request.POST.get('usuario')
@@ -86,6 +86,9 @@ def login_view(request):
     return render(request, 'login.html')
 
 
+# ==============================
+# DASHBOARDS
+# ==============================
 def dashboard_student(request):
     if request.session.get('rol') != 'estudiante':
         return redirect('login')

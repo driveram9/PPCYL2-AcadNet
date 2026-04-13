@@ -1,93 +1,33 @@
 from django.shortcuts import render, redirect
-import xml.etree.ElementTree as ET
-import os
+import requests
 
-RUTA_XML = os.path.join(os.path.dirname(__file__), 'registro.xml')
-
-
-def cargar_usuarios():
-    usuarios = {"estudiantes": {}, "tutores": {}}
-
-    if not os.path.exists(RUTA_XML):
-        print(f"No se encuentra {RUTA_XML}")
-        return usuarios
-
-    tree = ET.parse(RUTA_XML)
-    root = tree.getroot()
-
-    # Cargar estudiantes
-    for est in root.findall(".//estudiante"):
-        carnet = est.get("carnet")
-        usuarios["estudiantes"][carnet] = {
-            "nombre": est.text,
-            "contrasenia": est.get("contrasenia")
-        }
-
-    # Cargar tutores
-    for tut in root.findall(".//tutor"):
-        registro = tut.get("registro_personal")
-        usuarios["tutores"][registro] = {
-            "nombre": tut.text,
-            "contrasenia": tut.get("contrasenia")
-        }
-    return usuarios
-
+BACKEND_URL = "http://127.0.0.1:5000"  # Ajusta al puerto de tu Flask
 
 def login_view(request):
     if request.method == 'POST':
         usuario = request.POST.get('usuario')
         contrasenia = request.POST.get('contrasenia')
 
-        usuarios = cargar_usuarios()
+        # Enviar credenciales al backend
+        response = requests.post(f"{BACKEND_URL}/login",
+                                 json={"usuario": usuario, "contrasenia": contrasenia})
+        data = response.json()
 
-        # Admin
-        if usuario == "AdminPPCYL2" and contrasenia == "AdminPPCYL2771":
-            request.session['rol'] = 'admin'
-            request.session['nombre'] = 'Administrador del Sistema'
+        if data.get("status") == "ok":
+            rol = data.get("rol")
+            nombre = data.get("nombre")
+
+            request.session['rol'] = rol
+            request.session['nombre'] = nombre
             request.session['usuario'] = usuario
-            return redirect('admin_dashboard')
 
-        # Estudiante
-        if usuario in usuarios["estudiantes"]:
-            if contrasenia == usuarios["estudiantes"][usuario]["contrasenia"]:
-                request.session['rol'] = 'estudiante'
-                request.session['nombre'] = usuarios["estudiantes"][usuario]["nombre"]
-                request.session['carnet'] = usuario
+            if rol == "admin":
+                return redirect('admin_dashboard')
+            elif rol == "estudiante":
+                request.session['carnet'] = data.get("carnet")
                 return redirect('student')
-
-        # Tutor
-        if usuario in usuarios["tutores"]:
-            if contrasenia == usuarios["tutores"][usuario]["contrasenia"]:
-                request.session['rol'] = 'tutor'
-                request.session['nombre'] = usuarios["tutores"][usuario]["nombre"]
-                request.session['registro'] = usuario
+            elif rol == "tutor":
+                request.session['registro'] = data.get("registro_personal")
                 return redirect('tutor')
 
     return render(request, "login.html")
-
-
-def estudiante_dashboard(request):
-    if request.session.get('rol') != 'estudiante':
-        return redirect('login')
-    return render(request, 'dashboardStudent.html', {
-        'nombre': request.session.get('nombre'),
-        'carnet': request.session.get('carnet')
-    })
-
-
-def admin_dashboard(request):
-    if request.session.get('rol') != 'admin':
-        return redirect('login')
-    return render(request, 'dashboardAdmin.html', {
-        'nombre': request.session.get('nombre'),
-        'usuario': request.session.get('usuario')
-    })
-
-
-def tutor_dashboard(request):
-    if request.session.get('rol') != 'tutor':
-        return redirect('login')
-    return render(request, 'dashboardTutor.html', {
-        'nombre': request.session.get('nombre'),
-        'registro': request.session.get('registro')
-    })

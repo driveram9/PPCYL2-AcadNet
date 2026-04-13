@@ -1,4 +1,3 @@
-import flask
 from flask import redirect, url_for
 from flask import Flask
 from routes.auth import auth_bp

@@ -46,9 +46,19 @@
         </div>
 
         <div id="cargar-horarios" class="section" style="display:none;">
-            <h3>📤 Cargar Horarios (Archivo de texto)</h3>
-            <p>Formato: <code>Curso: 770, HorarioI: 08:00, HorarioF: 10:00</code></p>
-            <input type="file" id="fileHorarios" accept=".txt">
+            <h3>📤 Cargar Horarios (Archivo XML)</h3>
+            <p>Formato esperado del XML:</p>
+            <pre style="background:#f0f0f0; padding:10px; border-radius:5px;">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;horarios&gt;
+    &lt;horario&gt;
+        &lt;curso&gt;770&lt;/curso&gt;
+        &lt;horario_inicio&gt;08:00&lt;/horario_inicio&gt;
+        &lt;horario_fin&gt;10:00&lt;/horario_fin&gt;
+    &lt;/horario&gt;
+&lt;/horarios&gt;
+            </pre>
+            <input type="file" id="fileHorarios" accept=".xml">
             <button id="btnSubirHorarios">Subir Horarios</button>
             <div id="mensajeHorarios"></div>
         </div>
@@ -56,7 +66,14 @@
         <div id="ingreso-notas" class="section" style="display:none;">
             <h3>📝 Ingreso de Notas</h3>
             <p>Sube un archivo XML con las notas de tus estudiantes.</p>
-            <p>Formato esperado: <code>&lt;curso codigo="770"&gt;&lt;actividad nombre="Examen"&gt;&lt;nota carnet="101"&gt;85&lt;/nota&gt;&lt;/actividad&gt;&lt;/curso&gt;</code></p>
+            <p>Formato esperado:</p>
+            <pre style="background:#f0f0f0; padding:10px; border-radius:5px;">
+&lt;curso codigo="770"&gt;
+    &lt;actividad nombre="Examen 1"&gt;
+        &lt;nota carnet="101"&gt;85&lt;/nota&gt;
+    &lt;/actividad&gt;
+&lt;/curso&gt;
+            </pre>
             <input type="file" id="fileNotas" accept=".xml">
             <button id="btnSubirNotas">Subir Notas</button>
             <div id="mensajeNotas"></div>
@@ -124,27 +141,42 @@
     }
 
     // ============================================
-    // FUNCIÓN: SUBIR HORARIOS
+    // FUNCIÓN: SUBIR HORARIOS (XML)
     // ============================================
     document.getElementById('btnSubirHorarios')?.addEventListener('click', async () => {
         const fileInput = document.getElementById('fileHorarios');
         const file = fileInput.files[0];
         if (!file) {
-            document.getElementById('mensajeHorarios').innerHTML = '<p style="color:red">Selecciona un archivo</p>';
+            document.getElementById('mensajeHorarios').innerHTML = '<p style="color:red">❌ Selecciona un archivo XML</p>';
+            return;
+        }
+
+        if (!file.name.endsWith('.xml')) {
+            document.getElementById('mensajeHorarios').innerHTML = '<p style="color:red">❌ El archivo debe ser XML</p>';
             return;
         }
 
         const formData = new FormData();
         formData.append('archivo', file);
 
+        document.getElementById('mensajeHorarios').innerHTML = '<p>⏳ Procesando...</p>';
+
         const response = await fetch('/api/tutor/cargar-horarios', {
             method: 'POST',
             body: formData
         });
         const data = await response.json();
-        document.getElementById('mensajeHorarios').innerHTML = data.success
-            ? `<p style="color:green">✅ ${data.mensaje}</p>`
-            : `<p style="color:red">❌ ${data.error}</p>`;
+
+        if (data.success) {
+            let mensaje = `<p style="color:green">✅ ${data.mensaje}</p>`;
+            if (data.errores && data.errores.length > 0) {
+                mensaje += `<p style="color:orange">⚠️ Advertencias:<br>${data.errores.join('<br>')}</p>`;
+            }
+            document.getElementById('mensajeHorarios').innerHTML = mensaje;
+            cargarHorarios(); // Recargar tabla
+        } else {
+            document.getElementById('mensajeHorarios').innerHTML = `<p style="color:red">❌ ${data.error}</p>`;
+        }
     });
 
     // ============================================
@@ -154,18 +186,26 @@
         const fileInput = document.getElementById('fileNotas');
         const file = fileInput.files[0];
         if (!file) {
-            document.getElementById('mensajeNotas').innerHTML = '<p style="color:red">Selecciona un archivo XML</p>';
+            document.getElementById('mensajeNotas').innerHTML = '<p style="color:red">❌ Selecciona un archivo XML</p>';
+            return;
+        }
+
+        if (!file.name.endsWith('.xml')) {
+            document.getElementById('mensajeNotas').innerHTML = '<p style="color:red">❌ El archivo debe ser XML</p>';
             return;
         }
 
         const formData = new FormData();
         formData.append('archivo', file);
 
+        document.getElementById('mensajeNotas').innerHTML = '<p>⏳ Procesando...</p>';
+
         const response = await fetch('/api/tutor/notas', {
             method: 'POST',
             body: formData
         });
         const data = await response.json();
+
         document.getElementById('mensajeNotas').innerHTML = data.success
             ? `<p style="color:green">✅ ${data.mensaje}</p>`
             : `<p style="color:red">❌ ${data.error}</p>`;

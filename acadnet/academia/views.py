@@ -80,7 +80,6 @@ def tutor_dashboard(request):
         'cursos': cursos
     })
 
-
 @csrf_exempt
 def api_tutor_horarios(request):
     if request.session.get('rol') != 'tutor':
@@ -96,7 +95,6 @@ def api_tutor_horarios(request):
             return JsonResponse([], safe=False)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
-
 
 @csrf_exempt
 def api_tutor_limpiar_horarios(request):
@@ -119,7 +117,6 @@ def api_tutor_limpiar_horarios(request):
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
-
 @csrf_exempt
 def api_tutor_cargar_horarios(request):
     if request.session.get('rol') != 'tutor':
@@ -137,7 +134,6 @@ def api_tutor_cargar_horarios(request):
             return JsonResponse({'success': False, 'error': 'Error de conexión'}, status=500)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
-
 
 @csrf_exempt
 def api_tutor_notas(request):
@@ -171,3 +167,77 @@ def api_tutor_reportes(request):
             response.json() if response.status_code == 200 else {'actividades': [], 'promedios': {}, 'top_data': {}})
     except:
         return JsonResponse({'actividades': [], 'promedios': {}, 'top_data': {}})
+
+@csrf_exempt
+def api_estudiante_cursos(request, carnet):
+    """Obtener cursos del estudiante"""
+    if request.session.get('rol') != 'estudiante':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+    
+    try:
+        response = requests.get(f"{BACKEND_URL}/estudiante/cursos/{carnet}", timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json(), safe=False)
+        return JsonResponse([], safe=False)
+    except Exception as e:
+        return JsonResponse([], safe=False)
+
+
+@csrf_exempt
+def api_estudiante_tareas(request, carnet):
+    """Obtener tareas del estudiante"""
+    if request.session.get('rol') != 'estudiante':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+    
+    try:
+        response = requests.get(f"{BACKEND_URL}/estudiante/tareas/{carnet}", timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json(), safe=False)
+        return JsonResponse([], safe=False)
+    except Exception as e:
+        return JsonResponse([], safe=False)
+
+
+@csrf_exempt
+def api_estudiante_notas(request, carnet):
+    """Obtener notas del estudiante"""
+    if request.session.get('rol') != 'estudiante':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+    
+    try:
+        response = requests.get(f"{BACKEND_URL}/estudiante/notas/{carnet}", timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json())
+        return JsonResponse({'notas': [], 'cursos': {}})
+    except Exception as e:
+        return JsonResponse({'notas': [], 'cursos': {}})
+
+
+@csrf_exempt
+def api_estudiante_anuncios(request):
+    """Obtener anuncios generales"""
+    if request.session.get('rol') != 'estudiante':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+    
+    try:
+        response = requests.get(f"{BACKEND_URL}/anuncios", timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json(), safe=False)
+        return JsonResponse([], safe=False)
+    except Exception as e:
+        return JsonResponse([], safe=False)
+
+
+@csrf_exempt
+def api_estudiante_horarios(request):
+    """Obtener horarios de tutoría"""
+    if request.session.get('rol') != 'estudiante':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+    
+    try:
+        response = requests.get(f"{BACKEND_URL}/horarios/todos", timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json(), safe=False)
+        return JsonResponse([], safe=False)
+    except Exception as e:
+        return JsonResponse([], safe=False)

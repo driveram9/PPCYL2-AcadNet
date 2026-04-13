@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-*36ob@1@s%0y-i9*3%tgod$ax@a*yxf_485mro()_c)e+#&+en
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles', 'academia',
+    'django.contrib.staticfiles',
+    'academia',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -69,20 +71,48 @@ TEMPLATES = [
 WSGI_APPLICATION = 'fronted_django.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+# ============================================
+# CONFIGURACIÓN SIN BASE DE DATOS
+# ============================================
 
+# Opción 1: Configuración mínima (requerida por Django pero no se usará)
+# Django necesita DATABASES definida aunque no se use
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.',
-        'NAME': BASE_DIR / '',
+        'ENGINE': 'django.db.backends.dummy',  # Backend dummy (no hace nada)
     }
 }
 
+# Opción 2: Si la opción 1 da error, usa SQLite en memoria (no crea archivo)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': ':memory:',  # Base de datos en RAM, no en disco
+#     }
+# }
 
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
+# ============================================
+# SESIONES SIN BASE DE DATOS
+# ============================================
+
+# Usar caché para sesiones (no requiere base de datos)
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+# Configurar caché en memoria (no requiere Redis ni nada externo)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+# Tiempo de vida de la sesión (opcional)
+SESSION_COOKIE_AGE = 3600  # 1 hora
+SESSION_SAVE_EVERY_REQUEST = True  # Renovar sesión en cada request
+
+
+# Password validation (opcional, se puede mantener)
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -102,9 +132,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Guatemala'
 
 USE_I18N = True
 
@@ -115,3 +145,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

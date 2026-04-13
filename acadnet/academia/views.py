@@ -80,11 +80,6 @@ def tutor_dashboard(request):
         'cursos': cursos
     })
 
-
-# ============================================
-# APIS PARA TUTOR
-# ============================================
-
 @csrf_exempt
 def api_tutor_horarios(request):
     if request.session.get('rol') != 'tutor':
@@ -100,7 +95,6 @@ def api_tutor_horarios(request):
             return JsonResponse([], safe=False)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
-
 
 @csrf_exempt
 def api_tutor_limpiar_horarios(request):
@@ -123,7 +117,6 @@ def api_tutor_limpiar_horarios(request):
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
-
 @csrf_exempt
 def api_tutor_cargar_horarios(request):
     if request.session.get('rol') != 'tutor':
@@ -141,7 +134,6 @@ def api_tutor_cargar_horarios(request):
             return JsonResponse({'success': False, 'error': 'Error de conexión'}, status=500)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
-
 
 @csrf_exempt
 def api_tutor_notas(request):
@@ -175,11 +167,6 @@ def api_tutor_reportes(request):
             response.json() if response.status_code == 200 else {'actividades': [], 'promedios': {}, 'top_data': {}})
     except:
         return JsonResponse({'actividades': [], 'promedios': {}, 'top_data': {}})
-
-
-# ============================================
-# APIS PARA ESTUDIANTE
-# ============================================
 
 @csrf_exempt
 def api_estudiante_cursos(request, carnet):

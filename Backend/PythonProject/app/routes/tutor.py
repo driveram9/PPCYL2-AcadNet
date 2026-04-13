@@ -332,3 +332,147 @@ def reportes():
                            actividades=actividades,
                            promedios=promedios,
                            top_data=json.dumps(top_data))
+
+@tutor_bp.route("/api/cursos/<registro>", methods=["GET"])
+def api_get_cursos(registro):
+    """Obtener cursos de un tutor"""
+    cursos = obtener_cursos_tutor(registro)
+    return jsonify(cursos), 200
+
+
+@tutor_bp.route("/api/horarios/<registro>", methods=["GET"])
+def api_get_horarios(registro):
+    """Obtener horarios de un tutor"""
+    horarios = obtener_horarios_tutor(registro)
+    return jsonify(horarios), 200
+
+
+@tutor_bp.route("/api/horarios", methods=["POST"])
+def api_post_horarios():
+    """Guardar horarios de un tutor"""
+    data = request.get_json()
+    registro = data.get("registro")
+    horarios = data.get("horarios", [])
+    guardar_horarios_tutor(registro, horarios)
+    return jsonify({"success": True}), 200
+
+
+@tutor_bp.route("/api/horarios/cargar/<registro>", methods=["POST"])
+def api_cargar_horarios(registro):
+    """Cargar horarios desde archivo"""
+    if "archivo_horarios" not in request.files:
+        return jsonify({"success": False, "error": "No se envió archivo"}), 400
+
+    archivo = request.files["archivo_horarios"]
+    contenido = archivo.read().decode("utf-8")
+    lineas = contenido.splitlines()
+
+    cursos = obtener_cursos_tutor(registro)
+    cursos_codigos = [c["codigo"] for c in cursos]
+    horarios_procesados = []
+
+    for linea in lineas:
+        linea = linea.strip()
+        if not linea or linea.startswith('#'):
+            continue
+
+        curso_match = re.search(r'Curso:\s*([^,\s]+)', linea)
+        if not curso_match:
+            continue
+
+        codigo_curso = curso_match.group(1)
+        if codigo_curso not in cursos_codigos:
+            continue
+
+        horario_i_match = re.search(r'HorarioI:\s*(\d{1,2}:\d{2})', linea)
+        horario_f_match = re.search(r'HorarioF:\s*(\d{1,2}:\d{2})', linea)
+
+        if horario_i_match and horario_f_match:
+            horario_inicio = horario_i_match.group(1)
+            horario_fin = horario_f_match.group(1)
+            if len(horario_inicio.split(':')[0]) == 1:
+                horario_inicio = '0' + horario_inicio
+            if len(horario_fin.split(':')[0]) == 1:
+                horario_fin = '0' + horario_fin
+
+            horarios_procesados.append({
+                "curso": codigo_curso,
+                "horario_inicio": horario_inicio,
+                "horario_fin": horario_fin
+            })
+
+    if horarios_procesados:
+        horarios_actuales = obtener_horarios_tutor(registro)
+        horarios_actuales.extend(horarios_procesados)
+        guardar_horarios_tutor(registro, horarios_actuales)
+        return jsonify({"success": True, "mensaje": f"{len(horarios_procesados)} horarios cargados"})
+
+    return jsonify({"success": False, "error": "No se encontraron horarios válidos"}), 400
+
+
+@tutor_bp.route("/api/notas/<registro>", methods=["POST"])
+def api_cargar_notas(registro):
+    """Cargar notas desde archivo XML"""
+    if "archivo_notas" not in request.files:
+        return jsonify({"success": False, "error": "No se envió archivo"}), 400
+
+    archivo = request.files["archivo_notas"]
+    cursos = obtener_cursos_tutor(registro)
+    cursos_codigos = [c["codigo"] for c in cursos]
+    matriz = obtener_matriz_tutor(registro)
+
+    notas_agregadas = 0
+    notas_rechazadas = 0
+
+    try:
+        tree = ET.parse(archivo)
+        root = tree.getroot()
+
+        for curso in root.findall("curso"):
+            codigo_curso = curso.get("codigo")
+            if codigo_curso not in cursos_codigos:
+                continue
+
+            for actividad in curso.findall("actividad"):
+                nombre_actividad = actividad.get("nombre")
+                for nota_elem in actividad.findall("nota"):
+                    carnet = nota_elem.get("carnet")
+                    try:
+                        nota = float(nota_elem.text)
+                        if matriz.agregar(nombre_actividad, carnet, nota):
+                            notas_agregadas += 1
+                        else:
+                            notas_rechazadas += 1
+                    except ValueError:
+                        notas_rechazadas += 1
+
+        guardar_matriz_tutor(registro)
+        return jsonify(
+            {"success": True, "mensaje": f"{notas_agregadas} notas agregadas, {notas_rechazadas} rechazadas"})
+
+    except ET.ParseError:
+        return jsonify({"success": False, "error": "XML inválido"}), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@tutor_bp.route("/api/reportes/<registro>", methods=["GET"])
+def api_get_reportes(registro):
+    """Obtener datos para reportes"""
+    matriz = obtener_matriz_tutor(registro)
+    actividades = matriz.obtener_todas_actividades()
+
+    promedios = {}
+    for actividad in actividades:
+        promedios[actividad] = round(matriz.promedio_por_actividad(actividad), 2)
+
+    top_data = {}
+    for actividad in actividades:
+        top_notas = matriz.top_notas(actividad)
+        top_data[actividad] = [{"carnet": c, "nota": n} for c, n in top_notas[:10]]
+
+    return jsonify({
+        "actividades": actividades,
+        "promedios": promedios,
+        "top_data": top_data
+    }), 200

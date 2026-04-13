@@ -1,282 +1,103 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="es">
+
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Dashboard Tutor</title>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
 </head>
+
 <body>
 
 <section id="sidebar">
     <a href="#" class="brand">
         <i class='bx bx-user'></i>
-        <span class="text">Tutor: {{ nombre }}</span>
+        <span class="text">Tutor</span>
     </a>
 
-    <ul class="side-menu top">
-        <li class="active" data-section="horarios">
-            <a href="#"><i class="bx bx-time"></i><span class="text">Horarios</span></a>
-        </li>
-        <li data-section="cargar-horarios">
-            <a href="#"><i class="bx bx-upload"></i><span class="text">Cargar Horarios</span></a>
-        </li>
-        <li data-section="ingreso-notas">
-            <a href="#"><i class="bx bx-edit"></i><span class="text">Ingreso Notas</span></a>
-        </li>
-        <li data-section="tabla">
-            <a href="#"><i class="bx bx-table"></i><span class="text">Mis Horarios</span></a>
-        </li>
-        <li data-section="reportes">
-            <a href="#"><i class="bx bx-bar-chart"></i><span class="text">Reportes</span></a>
-        </li>
-    </ul>
+<ul class="side-menu top">
+
+    <li class="active">
+        <a href="#"><i class="bx bx-time"></i><span class="text">Horarios</span></a>
+    </li>
+
+    <li>
+        <a href="#"><i class="bx bx-upload"></i><span class="text">Cargar Horarios</span></a>
+    </li>
+
+    <li>
+        <a href="#"><i class="bx bx-edit"></i><span class="text">Ingreso Notas</span></a>
+    </li>
+
+    <li>
+        <a href="#"><i class="bx bx-table"></i><span class="text">Tabla</span></a>
+    </li>
+
+    <li>
+        <a href="#"><i class="bx bx-bar-chart"></i><span class="text">Reportes</span></a>
+    </li>
+
+</ul>
+
 </section>
 
 <section id="content">
-    <main>
-        <div id="horarios" class="section">
-            <h3>📋 Horarios de Tutoría</h3>
-            <p>Bienvenido, {{ nombre }} (Registro: {{ registro }})</p>
-            <p>Aquí podrás gestionar tus horarios de atención.</p>
-            <div id="listaHorarios"></div>
-        </div>
+<main>
 
-        <div id="cargar-horarios" class="section" style="display:none;">
-            <h3>📤 Cargar Horarios (Archivo XML)</h3>
-            <p>Formato esperado del XML:</p>
-            <pre style="background:#f0f0f0; padding:10px; border-radius:5px;">
-&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;horarios&gt;
-    &lt;horario&gt;
-        &lt;curso&gt;770&lt;/curso&gt;
-        &lt;horario_inicio&gt;08:00&lt;/horario_inicio&gt;
-        &lt;horario_fin&gt;10:00&lt;/horario_fin&gt;
-    &lt;/horario&gt;
-&lt;/horarios&gt;
-            </pre>
-            <input type="file" id="fileHorarios" accept=".xml">
-            <button id="btnSubirHorarios">Subir Horarios</button>
-            <div id="mensajeHorarios"></div>
-        </div>
+<div id="horarios" class="section">
+    <h3>Horarios</h3>
+    <p>Aquí podrás gestionar tus horarios.</p>
+</div>
 
-        <div id="ingreso-notas" class="section" style="display:none;">
-            <h3>📝 Ingreso de Notas</h3>
-            <p>Sube un archivo XML con las notas de tus estudiantes.</p>
-            <p>Formato esperado:</p>
-            <pre style="background:#f0f0f0; padding:10px; border-radius:5px;">
-&lt;curso codigo="770"&gt;
-    &lt;actividad nombre="Examen 1"&gt;
-        &lt;nota carnet="101"&gt;85&lt;/nota&gt;
-    &lt;/actividad&gt;
-&lt;/curso&gt;
-            </pre>
-            <input type="file" id="fileNotas" accept=".xml">
-            <button id="btnSubirNotas">Subir Notas</button>
-            <div id="mensajeNotas"></div>
-        </div>
+<div id="cargar-horarios" class="section" style="display:none;">
+    <h3>Cargar Horarios XML</h3>
+    <input type="file">
+    <button>Subir</button>
+</div>
 
-        <div id="tabla" class="section" style="display:none;">
-            <h3>📅 Mis Horarios Configurados</h3>
-            <table id="tablaHorarios">
-                <thead>
-                    <tr><th>Curso</th><th>Hora Inicio</th><th>Hora Fin</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+<div id="ingreso-notas" class="section" style="display:none;">
+    <h3>Ingreso de Notas</h3>
+    <input type="file">
+    <button>Subir XML</button>
+</div>
 
-        <div id="reportes" class="section" style="display:none;">
-            <h3>📊 Reportes de Notas</h3>
-            <div>
-                <label>Seleccionar Actividad:</label>
-                <select id="selectActividad"></select>
-            </div>
-            <canvas id="graficoPromedios" width="400" height="200"></canvas>
-            <canvas id="graficoTop" width="400" height="200"></canvas>
-            <button id="exportarPDF">📄 Exportar a PDF</button>
-        </div>
-    </main>
+<div id="tabla" class="section" style="display:none;">
+    <h3>Tabla de Horarios</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Curso</th>
+                <th>Hora Inicio</th>
+                <th>Hora Fin</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in horarios %}
+            <tr>
+                <td>{{ item.curso }}</td>
+                <td>{{ item.inicio }}</td>
+                <td>{{ item.fin }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="reportes" class="section" style="display:none;">
+    <h3>Reportes</h3>
+    <p>Aquí irán gráficos (ChartJS o Plotly).</p>
+</div>
+
+</main>
 </section>
 
-<script>
-    // ============================================
-    // MENÚ - CAMBIO DE SECCIONES
-    // ============================================
-    document.querySelectorAll('[data-section]').forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const sectionId = this.getAttribute('data-section');
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'none';
-            });
-            document.getElementById(sectionId).style.display = 'block';
-
-            document.querySelectorAll('[data-section]').forEach(li => li.classList.remove('active'));
-            this.classList.add('active');
-
-            if (sectionId === 'tabla') cargarHorarios();
-            if (sectionId === 'reportes') cargarReportes();
-        });
-    });
-
-    // ============================================
-    // FUNCIÓN: CARGAR HORARIOS DESDE BACKEND
-    // ============================================
-    async function cargarHorarios() {
-        const response = await fetch('/api/tutor/horarios');
-        const horarios = await response.json();
-
-        const tbody = document.querySelector('#tablaHorarios tbody');
-        tbody.innerHTML = '';
-        horarios.forEach(h => {
-            const row = tbody.insertRow();
-            row.insertCell(0).textContent = h.curso;
-            row.insertCell(1).textContent = h.horario_inicio;
-            row.insertCell(2).textContent = h.horario_fin;
-        });
-    }
-
-    // ============================================
-    // FUNCIÓN: SUBIR HORARIOS (XML)
-    // ============================================
-    document.getElementById('btnSubirHorarios')?.addEventListener('click', async () => {
-        const fileInput = document.getElementById('fileHorarios');
-        const file = fileInput.files[0];
-        if (!file) {
-            document.getElementById('mensajeHorarios').innerHTML = '<p style="color:red">❌ Selecciona un archivo XML</p>';
-            return;
-        }
-
-        if (!file.name.endsWith('.xml')) {
-            document.getElementById('mensajeHorarios').innerHTML = '<p style="color:red">❌ El archivo debe ser XML</p>';
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('archivo', file);
-
-        document.getElementById('mensajeHorarios').innerHTML = '<p>⏳ Procesando...</p>';
-
-        const response = await fetch('/api/tutor/cargar-horarios', {
-            method: 'POST',
-            body: formData
-        });
-        const data = await response.json();
-
-        if (data.success) {
-            let mensaje = `<p style="color:green">✅ ${data.mensaje}</p>`;
-            if (data.errores && data.errores.length > 0) {
-                mensaje += `<p style="color:orange">⚠️ Advertencias:<br>${data.errores.join('<br>')}</p>`;
-            }
-            document.getElementById('mensajeHorarios').innerHTML = mensaje;
-            cargarHorarios(); // Recargar tabla
-        } else {
-            document.getElementById('mensajeHorarios').innerHTML = `<p style="color:red">❌ ${data.error}</p>`;
-        }
-    });
-
-    // ============================================
-    // FUNCIÓN: SUBIR NOTAS
-    // ============================================
-    document.getElementById('btnSubirNotas')?.addEventListener('click', async () => {
-        const fileInput = document.getElementById('fileNotas');
-        const file = fileInput.files[0];
-        if (!file) {
-            document.getElementById('mensajeNotas').innerHTML = '<p style="color:red">❌ Selecciona un archivo XML</p>';
-            return;
-        }
-
-        if (!file.name.endsWith('.xml')) {
-            document.getElementById('mensajeNotas').innerHTML = '<p style="color:red">❌ El archivo debe ser XML</p>';
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('archivo', file);
-
-        document.getElementById('mensajeNotas').innerHTML = '<p>⏳ Procesando...</p>';
-
-        const response = await fetch('/api/tutor/notas', {
-            method: 'POST',
-            body: formData
-        });
-        const data = await response.json();
-
-        document.getElementById('mensajeNotas').innerHTML = data.success
-            ? `<p style="color:green">✅ ${data.mensaje}</p>`
-            : `<p style="color:red">❌ ${data.error}</p>`;
-    });
-
-    // ============================================
-    // FUNCIÓN: CARGAR REPORTES
-    // ============================================
-    let chartPromedios, chartTop;
-
-    async function cargarReportes() {
-        const response = await fetch('/api/tutor/reportes');
-        const data = await response.json();
-
-        const actividades = data.actividades || [];
-        const promedios = data.promedios || {};
-        const topData = data.top_data || {};
-
-        const select = document.getElementById('selectActividad');
-        select.innerHTML = '';
-        actividades.forEach(act => {
-            const option = document.createElement('option');
-            option.value = act;
-            option.textContent = act;
-            select.appendChild(option);
-        });
-
-        if (actividades.length > 0) {
-            // Gráfico de promedios
-            const ctx1 = document.getElementById('graficoPromedios').getContext('2d');
-            if (chartPromedios) chartPromedios.destroy();
-            chartPromedios = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(promedios),
-                    datasets: [{
-                        label: 'Promedio de Notas',
-                        data: Object.values(promedios),
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
-                    }]
-                },
-                options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
-            });
-
-            select.addEventListener('change', () => {
-                const actividad = select.value;
-                const top = topData[actividad] || [];
-                const ctx2 = document.getElementById('graficoTop').getContext('2d');
-                if (chartTop) chartTop.destroy();
-                chartTop = new Chart(ctx2, {
-                    type: 'bar',
-                    data: {
-                        labels: top.map(t => t.carnet),
-                        datasets: [{
-                            label: `Top Notas - ${actividad}`,
-                            data: top.map(t => t.nota),
-                            backgroundColor: 'rgba(255, 99, 132, 0.6)'
-                        }]
-                    },
-                    options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
-                });
-            });
-            select.dispatchEvent(new Event('change'));
-        }
-    }
-
-    document.getElementById('exportarPDF')?.addEventListener('click', () => {
-        const element = document.getElementById('reportes');
-        html2pdf().from(element).save();
-    });
-</script>
+<script src="{% static 'js/dashboard.js' %}"></script>
 
 </body>
 </html>

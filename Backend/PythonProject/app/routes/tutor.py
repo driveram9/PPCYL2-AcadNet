@@ -151,21 +151,31 @@ def api_limpiar_horarios(registro):
 @tutor_bp.route("/api/horarios/cargar/<registro>", methods=["POST"])
 def api_cargar_horarios(registro):
     """Cargar horarios desde archivo XML con manejo de codificación"""
+    print("=" * 50)
+    print("🔍 INICIANDO CARGA DE HORARIOS")
+    print(f"Registro: {registro}")
+
     if "archivo_horarios" not in request.files:
+        print("❌ No se encontró el archivo en la petición")
         return jsonify({"success": False, "error": "No se envió archivo"}), 400
 
     archivo = request.files["archivo_horarios"]
+    print(f"📄 Nombre del archivo: {archivo.filename}")
 
     if not archivo.filename.endswith('.xml'):
+        print("❌ El archivo no es XML")
         return jsonify({"success": False, "error": "El archivo debe ser XML"}), 400
 
     cursos = obtener_cursos_tutor(registro)
     cursos_codigos = [c["codigo"] for c in cursos]
+    print(f"📌 Cursos del tutor: {cursos_codigos}")
+
     horarios_procesados = []
 
     try:
         # Leer archivo raw
         raw_content = archivo.read()
+        print(f"📦 Tamaño del archivo: {len(raw_content)} bytes")
 
         # Intentar diferentes codificaciones
         texto = None
@@ -175,34 +185,47 @@ def api_cargar_horarios(registro):
                 print(f"✅ Archivo decodificado con {encoding}")
                 break
             except UnicodeDecodeError:
+                print(f"❌ Falló decodificación con {encoding}")
                 continue
 
         if texto is None:
+            print("❌ No se pudo decodificar el archivo")
             return jsonify({"success": False, "error": "No se pudo decodificar el archivo. Usa UTF-8"}), 400
 
         # Remover BOM si existe
         if texto.startswith('\ufeff'):
             texto = texto[1:]
+            print("✅ BOM removido")
+
+        print(f"📝 Contenido del archivo (primeros 200 chars): {texto[:200]}")
 
         # Parsear XML
         tree = ET.parse(StringIO(texto))
         root = tree.getroot()
+        print(f"✅ XML parseado correctamente")
+        print(f"📌 Elementos horario encontrados: {len(root.findall('horario'))}")
 
         for horario_xml in root.findall("horario"):
             codigo_curso = horario_xml.findtext("curso", "").strip()
             horario_inicio = horario_xml.findtext("horario_inicio", "").strip()
             horario_fin = horario_xml.findtext("horario_fin", "").strip()
 
+            print(f"   - Curso: {codigo_curso}, Inicio: {horario_inicio}, Fin: {horario_fin}")
+
             if not codigo_curso or not horario_inicio or not horario_fin:
+                print(f"      ❌ Campos vacíos, ignorado")
                 continue
 
             if codigo_curso not in cursos_codigos:
+                print(f"      ❌ Curso no asignado al tutor")
                 continue
 
             if not re.match(r'^([0-1][0-9]|2[0-3]):[0-5][0-9]$', horario_inicio):
+                print(f"      ❌ Horario inicio inválido: {horario_inicio}")
                 continue
 
             if not re.match(r'^([0-1][0-9]|2[0-3]):[0-5][0-9]$', horario_fin):
+                print(f"      ❌ Horario fin inválido: {horario_fin}")
                 continue
 
             horarios_procesados.append({
@@ -210,38 +233,51 @@ def api_cargar_horarios(registro):
                 "horario_inicio": horario_inicio,
                 "horario_fin": horario_fin
             })
+            print(f"      ✅ Horario válido agregado")
 
         if horarios_procesados:
             guardar_horarios_tutor(registro, horarios_procesados)
+            print(f"✅ {len(horarios_procesados)} horarios guardados")
             return jsonify({
                 "success": True,
                 "mensaje": f"✅ {len(horarios_procesados)} horarios cargados correctamente"
             })
         else:
+            print("❌ No se encontraron horarios válidos")
             return jsonify({
                 "success": False,
-                "error": "No se encontraron horarios válidos en el archivo"
+                "error": "No se encontraron horarios válidos en el archivo. Verifica el formato."
             }), 400
 
     except ET.ParseError as e:
+        print(f"❌ Error de parseo XML: {e}")
         return jsonify({"success": False, "error": f"Error en el XML: {str(e)}"}), 400
     except Exception as e:
+        print(f"❌ Error general: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 
 @tutor_bp.route("/api/notas/<registro>", methods=["POST"])
 def api_cargar_notas(registro):
     """Cargar notas desde archivo XML con manejo de codificación"""
+    print("=" * 50)
+    print("🔍 INICIANDO CARGA DE NOTAS")
+    print(f"Registro: {registro}")
+
     if "archivo_notas" not in request.files:
+        print("❌ No se encontró el archivo en la petición")
         return jsonify({"success": False, "error": "No se envió archivo"}), 400
 
     archivo = request.files["archivo_notas"]
+    print(f"📄 Nombre del archivo: {archivo.filename}")
 
     if not archivo.filename.endswith('.xml'):
+        print("❌ El archivo no es XML")
         return jsonify({"success": False, "error": "El archivo debe ser XML"}), 400
 
     cursos = obtener_cursos_tutor(registro)
     cursos_codigos = [c["codigo"] for c in cursos]
+    print(f"📌 Cursos del tutor: {cursos_codigos}")
     matriz = obtener_matriz_tutor(registro)
 
     notas_agregadas = 0
@@ -250,27 +286,91 @@ def api_cargar_notas(registro):
     try:
         # Leer archivo raw
         raw_content = archivo.read()
+        print(f"📦 Tamaño del archivo: {len(raw_content)} bytes")
 
         # Intentar diferentes codificaciones
         texto = None
         for encoding in ['utf-8-sig', 'utf-8', 'latin-1', 'cp1252']:
             try:
                 texto = raw_content.decode(encoding)
-                print(f"✅ Notas decodificado con {encoding}")
+                print(f"✅ Archivo decodificado con {encoding}")
                 break
             except UnicodeDecodeError:
+                print(f"❌ Falló decodificación con {encoding}")
                 continue
 
         if texto is None:
+            print("❌ No se pudo decodificar el archivo")
             return jsonify({"success": False, "error": "No se pudo decodificar el archivo. Usa UTF-8"}), 400
 
         # Remover BOM si existe
         if texto.startswith('\ufeff'):
             texto = texto[1:]
+            print("✅ BOM removido")
 
         # Parsear XML
         tree = ET.parse(StringIO(texto))
         root = tree.getroot()
+        print(f"✅ XML parseado correctamente")
 
         for curso in root.findall("curso"):
-            codigo_curso = curso
+            codigo_curso = curso.get("codigo")
+            print(f"📌 Procesando curso: {codigo_curso}")
+
+            if codigo_curso not in cursos_codigos:
+                print(f"   ❌ Curso no asignado al tutor")
+                continue
+
+            for actividad in curso.findall("actividad"):
+                nombre_actividad = actividad.get("nombre")
+                print(f"   📌 Actividad: {nombre_actividad}")
+
+                for nota_elem in actividad.findall("nota"):
+                    carnet = nota_elem.get("carnet")
+                    try:
+                        nota = float(nota_elem.text)
+                        if matriz.agregar(nombre_actividad, carnet, nota):
+                            notas_agregadas += 1
+                            print(f"      ✅ Nota {nota} agregada para {carnet}")
+                        else:
+                            notas_rechazadas += 1
+                            print(f"      ❌ Nota {nota} rechazada (fuera de rango 0-100)")
+                    except ValueError:
+                        notas_rechazadas += 1
+                        print(f"      ❌ Nota inválida para {carnet}: {nota_elem.text}")
+
+        guardar_matriz_tutor(registro)
+        print(f"✅ Notas cargadas: {notas_agregadas} agregadas, {notas_rechazadas} rechazadas")
+        return jsonify({
+            "success": True,
+            "mensaje": f"{notas_agregadas} notas agregadas, {notas_rechazadas} rechazadas"
+        })
+
+    except ET.ParseError as e:
+        print(f"❌ Error de parseo XML: {e}")
+        return jsonify({"success": False, "error": f"Error en el XML: {str(e)}"}), 400
+    except Exception as e:
+        print(f"❌ Error general: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@tutor_bp.route("/api/reportes/<registro>", methods=["GET"])
+def api_get_reportes(registro):
+    """Obtener datos para reportes"""
+    matriz = obtener_matriz_tutor(registro)
+    actividades = matriz.obtener_todas_actividades()
+
+    promedios = {}
+    for actividad in actividades:
+        promedios[actividad] = round(matriz.promedio_por_actividad(actividad), 2)
+
+    top_data = {}
+    for actividad in actividades:
+        top_notas = matriz.top_notas(actividad)
+        top_data[actividad] = [{"carnet": c, "nota": n} for c, n in top_notas[:10]]
+
+    return jsonify({
+        "actividades": actividades,
+        "promedios": promedios,
+        "top_data": top_data
+    }), 200

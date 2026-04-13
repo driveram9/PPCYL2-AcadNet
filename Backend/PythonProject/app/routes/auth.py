@@ -3,8 +3,10 @@ import os
 import xml.etree.ElementTree as ET
 
 auth_bp = Blueprint("auth", __name__)
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-xml_path = os.path.join(BASE_DIR, "registro.xml")
+upload_folder = os.path.join(BASE_DIR, "..", "uploads")
+xml_path = os.path.join(upload_folder, "registro.xml")
 
 # ============================================
 # CREDENCIALES DEL ADMIN (dentro del código)
@@ -21,7 +23,6 @@ def login_form():
     if request.method == "POST":
         usuario = request.form.get("usuario")
         contrasenia = request.form.get("contrasenia")
-        print(f"Intento de login: usuario={usuario}, contrasenia={contrasenia}")
 
         # ========================================
         # 1. VALIDAR ADMIN (desde el código)
@@ -39,31 +40,25 @@ def login_form():
         if os.path.exists(xml_path):
             try:
                 tree = ET.parse(xml_path)
-                root = tree.getroot()  # raíz = <configuraciones>
+                root = tree.getroot()
 
                 # Validar tutores
-                tutores = root.find("tutores")
-                if tutores is not None:
-                    for tutor in tutores.findall("tutor"):
-                        print(f"🔎 Tutor encontrado: registro={tutor.get('registro_personal')}, contrasenia={tutor.get('contrasenia')}")
-                        if tutor.get("registro_personal") == usuario and tutor.get("contrasenia") == contrasenia:
-                            session["rol"] = "tutor"
-                            session["usuario"] = tutor.text.strip()
-                            session["registro_personal"] = tutor.get("registro_personal")
-                            print(f"✅ Tutor logueado: {tutor.text.strip()}")
-                            return redirect(url_for("student.student_home"))
+                for tutor in root.findall("tutores/tutor"):
+                    if tutor.get("registro_personal") == usuario and tutor.get("contrasenia") == contrasenia:
+                        session["rol"] = "tutor"
+                        session["usuario"] = tutor.text.strip()
+                        session["registro_personal"] = tutor.get("registro_personal")
+                        print(f"✅ Tutor logueado: {tutor.text.strip()}")
+                        return redirect(url_for("tutor.tutor_dashboard"))
 
                 # Validar estudiantes
-                estudiantes = root.find("estudiantes")
-                if estudiantes is not None:
-                    for estudiante in estudiantes.findall("estudiante"):
-                        print(f"🔎 Estudiante encontrado: carnet={estudiante.get('carnet')}, contrasenia={estudiante.get('contrasenia')}, nombre={estudiante.text.strip()}")
-                        if estudiante.get("carnet") == usuario and estudiante.get("contrasenia") == contrasenia:
-                            session["rol"] = "estudiante"
-                            session["usuario"] = estudiante.text.strip()
-                            session["carnet"] = estudiante.get("carnet")
-                            print(f"✅ Estudiante logueado: {estudiante.text.strip()}")
-                            return redirect(url_for("student.student_home"))
+                for estudiante in root.findall("estudiantes/estudiante"):
+                    if estudiante.get("carnet") == usuario and estudiante.get("contrasenia") == contrasenia:
+                        session["rol"] = "estudiante"
+                        session["usuario"] = estudiante.text.strip()
+                        session["carnet"] = estudiante.get("carnet")
+                        print(f"✅ Estudiante logueado: {estudiante.text.strip()}")
+                        return redirect(url_for("student.student_home"))
 
             except ET.ParseError:
                 print("❌ Error al parsear el archivo XML")

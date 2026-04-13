@@ -48,7 +48,7 @@
         <div id="cargar-horarios" class="section" style="display:none;">
             <h3>📤 Cargar Horarios (Archivo XML)</h3>
             <p>Formato esperado del XML:</p>
-            <pre style="background:#f0f0f0; padding:10px; border-radius:5px;">
+            <pre style="background:#f0f0f0; padding:10px; border-radius:5px; font-size:12px;">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;horarios&gt;
     &lt;horario&gt;
@@ -67,7 +67,7 @@
             <h3>📝 Ingreso de Notas</h3>
             <p>Sube un archivo XML con las notas de tus estudiantes.</p>
             <p>Formato esperado:</p>
-            <pre style="background:#f0f0f0; padding:10px; border-radius:5px;">
+            <pre style="background:#f0f0f0; padding:10px; border-radius:5px; font-size:12px;">
 &lt;curso codigo="770"&gt;
     &lt;actividad nombre="Examen 1"&gt;
         &lt;nota carnet="101"&gt;85&lt;/nota&gt;
@@ -81,11 +81,20 @@
 
         <div id="tabla" class="section" style="display:none;">
             <h3>📅 Mis Horarios Configurados</h3>
-            <table id="tablaHorarios">
+            <button id="btnRefrescarHorarios" style="background:#17a2b8; margin-bottom:15px;">🔄 Refrescar</button>
+            <table id="tablaHorarios" style="width:100%; border-collapse: collapse;">
                 <thead>
-                    <tr><th>Curso</th><th>Hora Inicio</th><th>Hora Fin</th></tr>
+                    <tr style="background:#f2f2f2;">
+                        <th style="padding:10px; border:1px solid #ddd;">Curso</th>
+                        <th style="padding:10px; border:1px solid #ddd;">Hora Inicio</th>
+                        <th style="padding:10px; border:1px solid #ddd;">Hora Fin</th>
+                    </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                    <tr>
+                        <td colspan="3" style="text-align:center; padding:20px;">Cargando horarios...</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
 
@@ -96,13 +105,23 @@
                 <select id="selectActividad"></select>
             </div>
             <canvas id="graficoPromedios" width="400" height="200"></canvas>
-            <canvas id="graficoTop" width="400" height="200"></canvas>
+            <canvas id="graficoTop" width="400" height="200" style="margin-top:30px;"></canvas>
             <button id="exportarPDF">📄 Exportar a PDF</button>
         </div>
     </main>
 </section>
 
 <script>
+    // ============================================
+    // AL CARGAR LA PÁGINA - Mostrar sección Horarios
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.display = 'none';
+        });
+        document.getElementById('horarios').style.display = 'block';
+    });
+
     // ============================================
     // MENÚ - CAMBIO DE SECCIONES
     // ============================================
@@ -127,18 +146,34 @@
     // FUNCIÓN: CARGAR HORARIOS DESDE BACKEND
     // ============================================
     async function cargarHorarios() {
-        const response = await fetch('/api/tutor/horarios');
-        const horarios = await response.json();
-
         const tbody = document.querySelector('#tablaHorarios tbody');
-        tbody.innerHTML = '';
-        horarios.forEach(h => {
-            const row = tbody.insertRow();
-            row.insertCell(0).textContent = h.curso;
-            row.insertCell(1).textContent = h.horario_inicio;
-            row.insertCell(2).textContent = h.horario_fin;
-        });
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">Cargando horarios...</td></tr>';
+
+        try {
+            const response = await fetch('/api/tutor/horarios');
+            const horarios = await response.json();
+
+            tbody.innerHTML = '';
+
+            if (horarios.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">📭 No hay horarios cargados. Usa la opción "Cargar Horarios" para agregar.</td></tr>';
+            } else {
+                horarios.forEach(h => {
+                    const row = tbody.insertRow();
+                    row.insertCell(0).innerHTML = `<strong>${h.curso}</strong>`;
+                    row.insertCell(1).textContent = h.horario_inicio;
+                    row.insertCell(2).textContent = h.horario_fin;
+                });
+            }
+        } catch (error) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:red;">❌ Error al cargar horarios</td></tr>';
+        }
     }
+
+    // Botón refrescar
+    document.getElementById('btnRefrescarHorarios')?.addEventListener('click', () => {
+        cargarHorarios();
+    });
 
     // ============================================
     // FUNCIÓN: SUBIR HORARIOS (XML)
@@ -161,21 +196,22 @@
 
         document.getElementById('mensajeHorarios').innerHTML = '<p>⏳ Procesando...</p>';
 
-        const response = await fetch('/api/tutor/cargar-horarios', {
-            method: 'POST',
-            body: formData
-        });
-        const data = await response.json();
+        try {
+            const response = await fetch('/api/tutor/cargar-horarios', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
 
-        if (data.success) {
-            let mensaje = `<p style="color:green">✅ ${data.mensaje}</p>`;
-            if (data.errores && data.errores.length > 0) {
-                mensaje += `<p style="color:orange">⚠️ Advertencias:<br>${data.errores.join('<br>')}</p>`;
+            if (data.success) {
+                document.getElementById('mensajeHorarios').innerHTML = `<p style="color:green">✅ ${data.mensaje}</p>`;
+                cargarHorarios(); // Recargar tabla
+                fileInput.value = ''; // Limpiar input
+            } else {
+                document.getElementById('mensajeHorarios').innerHTML = `<p style="color:red">❌ ${data.error}</p>`;
             }
-            document.getElementById('mensajeHorarios').innerHTML = mensaje;
-            cargarHorarios(); // Recargar tabla
-        } else {
-            document.getElementById('mensajeHorarios').innerHTML = `<p style="color:red">❌ ${data.error}</p>`;
+        } catch (error) {
+            document.getElementById('mensajeHorarios').innerHTML = '<p style="color:red">❌ Error de conexión con el servidor</p>';
         }
     });
 
@@ -200,15 +236,23 @@
 
         document.getElementById('mensajeNotas').innerHTML = '<p>⏳ Procesando...</p>';
 
-        const response = await fetch('/api/tutor/notas', {
-            method: 'POST',
-            body: formData
-        });
-        const data = await response.json();
+        try {
+            const response = await fetch('/api/tutor/notas', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
 
-        document.getElementById('mensajeNotas').innerHTML = data.success
-            ? `<p style="color:green">✅ ${data.mensaje}</p>`
-            : `<p style="color:red">❌ ${data.error}</p>`;
+            document.getElementById('mensajeNotas').innerHTML = data.success
+                ? `<p style="color:green">✅ ${data.mensaje}</p>`
+                : `<p style="color:red">❌ ${data.error}</p>`;
+
+            if (data.success) {
+                fileInput.value = ''; // Limpiar input
+            }
+        } catch (error) {
+            document.getElementById('mensajeNotas').innerHTML = '<p style="color:red">❌ Error de conexión con el servidor</p>';
+        }
     });
 
     // ============================================
@@ -217,58 +261,91 @@
     let chartPromedios, chartTop;
 
     async function cargarReportes() {
-        const response = await fetch('/api/tutor/reportes');
-        const data = await response.json();
+        try {
+            const response = await fetch('/api/tutor/reportes');
+            const data = await response.json();
 
-        const actividades = data.actividades || [];
-        const promedios = data.promedios || {};
-        const topData = data.top_data || {};
+            const actividades = data.actividades || [];
+            const promedios = data.promedios || {};
+            const topData = data.top_data || {};
 
-        const select = document.getElementById('selectActividad');
-        select.innerHTML = '';
-        actividades.forEach(act => {
-            const option = document.createElement('option');
-            option.value = act;
-            option.textContent = act;
-            select.appendChild(option);
-        });
-
-        if (actividades.length > 0) {
-            // Gráfico de promedios
-            const ctx1 = document.getElementById('graficoPromedios').getContext('2d');
-            if (chartPromedios) chartPromedios.destroy();
-            chartPromedios = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(promedios),
-                    datasets: [{
-                        label: 'Promedio de Notas',
-                        data: Object.values(promedios),
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
-                    }]
-                },
-                options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+            const select = document.getElementById('selectActividad');
+            select.innerHTML = '<option value="">Seleccione una actividad</option>';
+            actividades.forEach(act => {
+                const option = document.createElement('option');
+                option.value = act;
+                option.textContent = act;
+                select.appendChild(option);
             });
 
-            select.addEventListener('change', () => {
-                const actividad = select.value;
-                const top = topData[actividad] || [];
-                const ctx2 = document.getElementById('graficoTop').getContext('2d');
-                if (chartTop) chartTop.destroy();
-                chartTop = new Chart(ctx2, {
+            if (actividades.length > 0) {
+                // Gráfico de promedios
+                const ctx1 = document.getElementById('graficoPromedios').getContext('2d');
+                if (chartPromedios) chartPromedios.destroy();
+                chartPromedios = new Chart(ctx1, {
                     type: 'bar',
                     data: {
-                        labels: top.map(t => t.carnet),
+                        labels: Object.keys(promedios),
                         datasets: [{
-                            label: `Top Notas - ${actividad}`,
-                            data: top.map(t => t.nota),
-                            backgroundColor: 'rgba(255, 99, 132, 0.6)'
+                            label: 'Promedio de Notas',
+                            data: Object.values(promedios),
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
                         }]
                     },
-                    options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+                    options: {
+                        responsive: true,
+                        scales: { y: { beginAtZero: true, max: 100 } },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Promedio: ${context.raw.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 });
-            });
-            select.dispatchEvent(new Event('change'));
+
+                select.addEventListener('change', () => {
+                    const actividad = select.value;
+                    if (actividad && topData[actividad]) {
+                        const top = topData[actividad];
+                        const ctx2 = document.getElementById('graficoTop').getContext('2d');
+                        if (chartTop) chartTop.destroy();
+                        chartTop = new Chart(ctx2, {
+                            type: 'bar',
+                            data: {
+                                labels: top.map(t => t.carnet),
+                                datasets: [{
+                                    label: `Top Notas - ${actividad}`,
+                                    data: top.map(t => t.nota),
+                                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: { y: { beginAtZero: true, max: 100 } },
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return `Nota: ${context.raw}`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error al cargar reportes:', error);
         }
     }
 

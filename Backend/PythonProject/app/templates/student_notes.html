@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Notas - {{ curso }}</title>
+</head>
+<body>
+    <h1>Notas del curso: {{ curso }}</h1>
+    <table border="1">
+        <tr><th>Tarea</th><th>Nota</th></tr>
+        {% for tarea in notas %}
+            <tr><td>{{ tarea.nombre }}</td><td>{{ tarea.nota }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <a href="{{ url_for('student.student_courses') }}">Volver a Cursos</a>
+</body>
+</html>

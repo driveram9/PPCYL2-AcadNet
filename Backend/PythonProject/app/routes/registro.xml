@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuraciones>
-   <admin usuario="AdminPPCYL2" contrasenia="AdminPPCYL2771"></admin>
+    <admin usuario="AdminPPCYL2" contrasenia="AdminPPCYL2771"></admin>
 
     <cursos>
         <curso codigo="770">Matematica Basica</curso>
@@ -41,11 +41,16 @@
 
     <asignaciones>
         <c_tutores>
+            <!-- Juan Perez (registro: 201) da estos cursos -->
             <tutor_curso codigo="770">201</tutor_curso>
             <tutor_curso codigo="771">201</tutor_curso>
+
+            <!-- Maria Lopez (registro: 202) da estos cursos -->
             <tutor_curso codigo="772">202</tutor_curso>
-            <tutor_curso codigo="773">203</tutor_curso>
             <tutor_curso codigo="774">202</tutor_curso>
+
+            <!-- Carlos Hernandez (registro: 203) da este curso -->
+            <tutor_curso codigo="773">203</tutor_curso>
         </c_tutores>
 
         <c_estudiante>

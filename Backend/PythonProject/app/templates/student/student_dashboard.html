@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Estudiante</title>
+</head>
+<body>
+    <h1>Bienvenido, {{ nombre }}</h1>
+    <p>Carnet: {{ carnet }}</p>
+
+    <h2>Menú</h2>
+    <ul>
+        <li><a href="{{ url_for('student.student_courses') }}">Cursos</a></li>
+        <li><a href="{{ url_for('auth.logout') }}">Cerrar sesión</a></li>
+    </ul>
+</body>
+</html>

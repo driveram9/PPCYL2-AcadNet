@@ -132,74 +132,84 @@ def tutor_dashboard():
                            cursos=cursos)
 
 
-@tutor_bp.route("/api/horarios/cargar/<registro>", methods=["POST"])
-def api_cargar_horarios(registro):
-    """Cargar horarios desde archivo XML (REEMPLAZA los existentes)"""
-    if "archivo_horarios" not in request.files:
-        return jsonify({"success": False, "error": "No se envió archivo"}), 400
+@tutor_bp.route("/tutor/horarios", methods=["GET", "POST"])
+def configurar_horarios():
+    """Configurar horarios de tutoría"""
+    if session.get("rol") != "tutor":
+        return redirect(url_for("auth.login_form"))
 
-    archivo = request.files["archivo_horarios"]
-    cursos = obtener_cursos_tutor(registro)
-    cursos_codigos = [c["codigo"] for c in cursos]
-    horarios_procesados = []
+    registro_personal = session.get("registro_personal")
+    cursos = obtener_cursos_tutor(registro_personal)
+    mensaje = None
     errores = []
 
-    try:
-        tree = ET.parse(archivo)
-        root = tree.getroot()
+    print(f"\n🔍 === CONFIGURAR HORARIOS ===")
+    print(f"Tutor: {registro_personal}")
+    print(f"Cursos del tutor: {[c['codigo'] for c in cursos]}")
 
-        for horario_xml in root.findall("horario"):
-            codigo_curso = horario_xml.findtext("curso", "")
-            horario_inicio = horario_xml.findtext("horario_inicio", "")
-            horario_fin = horario_xml.findtext("horario_fin", "")
+    if request.method == "POST":
+        if "archivo_horarios" in request.files:
+            archivo = request.files["archivo_horarios"]
+            if archivo.filename and archivo.filename.endswith('.xml'):
+                try:
+                    tree = ET.parse(archivo)
+                    root = tree.getroot()
 
-            # Validar curso
-            if codigo_curso not in cursos_codigos:
-                errores.append(f"Curso {codigo_curso} no asignado al tutor")
-                continue
+                    cursos_codigos = [c["codigo"] for c in cursos]
+                    horarios_procesados = []
 
-            # Validar formato de horas
-            if not re.match(r'^([0-1][0-9]|2[0-3]):[0-5][0-9]$', horario_inicio):
-                errores.append(f"Horario inicio inválido: {horario_inicio}")
-                continue
+                    for horario_xml in root.findall("horario"):
+                        codigo_curso = horario_xml.findtext("curso", "")
+                        horario_inicio = horario_xml.findtext("horario_inicio", "")
+                        horario_fin = horario_xml.findtext("horario_fin", "")
 
-            if not re.match(r'^([0-1][0-9]|2[0-3]):[0-5][0-9]$', horario_fin):
-                errores.append(f"Horario fin inválido: {horario_fin}")
-                continue
+                        # Validar curso
+                        if codigo_curso not in cursos_codigos:
+                            errores.append(f"Curso {codigo_curso} no asignado al tutor")
+                            continue
 
-            horarios_procesados.append({
-                "curso": codigo_curso,
-                "horario_inicio": horario_inicio,
-                "horario_fin": horario_fin
-            })
+                        # Validar formato de horas (HH:MM)
+                        if not re.match(r'^([0-1][0-9]|2[0-3]):[0-5][0-9]$', horario_inicio):
+                            errores.append(f"Horario inicio inválido: {horario_inicio}")
+                            continue
 
-        if horarios_procesados:
-            # ✅ REEMPLAZAR (no agregar)
-            guardar_horarios_tutor(registro, horarios_procesados)
-            return jsonify({
-                "success": True,
-                "mensaje": f"{len(horarios_procesados)} horarios cargados (reemplazados)",
-                "errores": errores
-            })
-        else:
-            return jsonify({"success": False, "error": "No se encontraron horarios válidos", "errores": errores}), 400
+                        if not re.match(r'^([0-1][0-9]|2[0-3]):[0-5][0-9]$', horario_fin):
+                            errores.append(f"Horario fin inválido: {horario_fin}")
+                            continue
 
-    except ET.ParseError:
-        return jsonify({"success": False, "error": "El archivo no es un XML válido"}), 400
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+                        horarios_procesados.append({
+                            "curso": codigo_curso,
+                            "horario_inicio": horario_inicio,
+                            "horario_fin": horario_fin
+                        })
 
+                    if horarios_procesados:
+                        horarios_actuales = obtener_horarios_tutor(registro_personal)
+                        horarios_actuales.extend(horarios_procesados)
+                        guardar_horarios_tutor(registro_personal, horarios_actuales)
+                        mensaje = f"✅ {len(horarios_procesados)} horarios cargados exitosamente"
+                    else:
+                        mensaje = "⚠️ No se encontraron horarios válidos en el archivo"
 
-@tutor_bp.route("/api/horarios/limpiar/<registro>", methods=["DELETE"])
-def api_limpiar_horarios(registro):
-    """Limpiar todos los horarios de un tutor"""
-    try:
-        horario_file = os.path.join(HORARIOS_FOLDER, f"{registro}.json")
-        if os.path.exists(horario_file):
-            os.remove(horario_file)
-        return jsonify({"success": True, "mensaje": "Horarios limpiados"}), 200
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+                    if errores:
+                        print(f"Errores: {errores}")
+
+                except ET.ParseError:
+                    mensaje = "❌ Error: El archivo no es un XML válido"
+                except Exception as e:
+                    print(f"❌ Error: {e}")
+                    mensaje = f"❌ Error al procesar archivo: {str(e)}"
+            else:
+                mensaje = "❌ Por favor, seleccione un archivo XML válido"
+
+    horarios = obtener_horarios_tutor(registro_personal)
+    return render_template("tutor/horarios.html",
+                           usuario=session.get("usuario"),
+                           cursos=cursos,
+                           horarios=horarios,
+                           mensaje=mensaje,
+                           errores=errores)
+
 
 @tutor_bp.route("/tutor/notas", methods=["GET", "POST"])
 def ingresar_notas():

@@ -2,16 +2,13 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Vistas principales
     path('', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-
-    # Dashboards
     path('admin/', views.admin_dashboard, name='admin_dashboard'),
     path('tutor/', views.tutor_dashboard, name='tutor_dashboard'),
     path('estudiante/', views.estudiante_dashboard, name='estudiante_dashboard'),
 
-    # APIs para el tutor
+    # APIs Tutor
     path('api/tutor/horarios', views.api_tutor_horarios, name='api_tutor_horarios'),
     path('api/tutor/limpiar-horarios', views.api_tutor_limpiar_horarios, name='api_tutor_limpiar_horarios'),
     path('api/tutor/cargar-horarios', views.api_tutor_cargar_horarios, name='api_tutor_cargar_horarios'),

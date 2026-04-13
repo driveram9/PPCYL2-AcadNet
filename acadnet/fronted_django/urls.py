@@ -2,6 +2,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('', include('academia.urls')),
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),  # Admin nativo de Django
+    path('', include('academia.urls')),  # Tus vistas personalizadas
 ]

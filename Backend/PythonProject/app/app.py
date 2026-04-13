@@ -22,7 +22,7 @@ def create_app():
     # ********************************************* REDIRIGE A AUTH_LOGIN***********************************************
     @app.route("/")
     def home():
-        return redirect(url_for("auth.login_form"))
+        return redirect(url_for("auth.login_from"))
 
     return app
 

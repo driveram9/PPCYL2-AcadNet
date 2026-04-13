@@ -241,3 +241,6 @@ def api_estudiante_horarios(request):
         return JsonResponse([], safe=False)
     except Exception as e:
         return JsonResponse([], safe=False)
+#Arrancar el frontend
+#cd acadnet
+#python manage.py runserver

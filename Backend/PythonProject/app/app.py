@@ -162,3 +162,8 @@ if __name__ == "__main__":
     print("   GET  /api/cursos/<registro>")
     print("=" * 50)
     app.run(debug=True, port=5000)
+
+#Como arrancar el servidor
+#cd Backend\PythonProject\app
+#python app.py
+#cd ..

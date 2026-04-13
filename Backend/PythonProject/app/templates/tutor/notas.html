@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingreso de Notas - Tutor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
+        .header { background: #17a2b8; color: white; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="file"] { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
+        button { background: #17a2b8; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .mensaje { padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .btn-volver { background: #6c757d; margin-right: 10px; }
+        .info { background: #e8f0fe; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-size: 14px; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📝 Ingreso de Notas</h1>
+        <p>Tutor: {{ usuario }}</p>
+    </div>
+
+    <div class="container">
+        <a href="{{ url_for('tutor.tutor_dashboard') }}">
+            <button class="btn-volver">← Volver al Panel</button>
+        </a>
+
+        <div class="card">
+            <h2>Cargar Notas desde XML</h2>
+            <div class="info">
+                <strong>📌 Formato esperado del XML:</strong>
+                <pre>
+&lt;curso codigo="PC-2"&gt;
+    &lt;actividad nombre="Examen 1"&gt;
+        &lt;nota carnet="20240001"&gt;85&lt;/nota&gt;
+        &lt;nota carnet="20240002"&gt;92&lt;/nota&gt;
+    &lt;/actividad&gt;
+    &lt;actividad nombre="Tarea 1"&gt;
+        &lt;nota carnet="20240001"&gt;78&lt;/nota&gt;
+    &lt;/actividad&gt;
+&lt;/curso&gt;
+                </pre>
+                <strong>⚠️ Nota:</strong> Las notas deben estar entre 0 y 100.
+            </div>
+
+            {% if mensaje %}
+                <div class="mensaje success">{{ mensaje }}</div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>📄 Archivo XML de notas</label>
+                    <input type="file" name="archivo_notas" accept=".xml" required>
+                </div>
+                <button type="submit">📤 Cargar Notas</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>📚 Mis Cursos</h2>
+            <ul>
+                {% for curso in cursos %}
+                    <li><strong>{{ curso.codigo }}</strong> - {{ curso.nombre }}</li>
+                {% else %}
+                    <li>No tienes cursos asignados</li>
+                {% endfor %}
+            </ul>
+            <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                💡 Solo podrás cargar notas para los cursos que tienes asignados.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

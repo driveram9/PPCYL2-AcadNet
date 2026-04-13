@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar Horarios - Tutor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
+        .header { background: #28a745; color: white; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="file"] { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
+        button { background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #1e7e34; }
+        .mensaje { padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .btn-volver { background: #6c757d; margin-right: 10px; }
+        .info { background: #e8f0fe; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⏰ Configurar Horarios de Tutoría</h1>
+        <p>Tutor: {{ usuario }}</p>
+    </div>
+
+    <div class="container">
+        <a href="{{ url_for('tutor.tutor_dashboard') }}">
+            <button class="btn-volver">← Volver al Panel</button>
+        </a>
+
+        <div class="card">
+            <h2>Cargar Horarios desde Archivo</h2>
+            <div class="info">
+                <strong>📌 Formato esperado:</strong><br>
+                Curso: PC-2, HorarioI: 08:00, HorarioF: 10:00<br>
+                Curso: MAT-101, HorarioI: 14:30, HorarioF: 16:30<br>
+                <br>
+                <strong>⚠️ Nota:</strong> Solo se tomarán en cuenta los cursos que tienes asignados.
+            </div>
+
+            {% if mensaje %}
+                <div class="mensaje success">{{ mensaje }}</div>
+            {% endif %}
+
+            {% if errores %}
+                <div class="mensaje error">
+                    {% for error in errores %}
+                        • {{ error }}<br>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>📄 Archivo de horarios (.txt)</label>
+                    <input type="file" name="archivo_horarios" accept=".txt" required>
+                </div>
+                <button type="submit">📤 Cargar Horarios</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>📅 Mis Horarios Configurados</h2>
+            {% if horarios %}
+                <table>
+                    <thead>
+                        <tr><th>Curso</th><th>Horario Inicio</th><th>Horario Fin</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for h in horarios %}
+                            <tr>
+                                <td><strong>{{ h.curso }}</strong></td>
+                                <td>{{ h.horario_inicio }}</td>
+                                <td>{{ h.horario_fin }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No hay horarios configurados aún. Carga un archivo para comenzar.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

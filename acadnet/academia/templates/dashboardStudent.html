@@ -5,50 +5,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Dashboard Estudiante</title>
 
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 </head>
 
 <body>
     <section id="sidebar">
         <a href="#" class="brand">
-            <i class='bx bx-badge-check'></i>
+            <i class='bx bx-user'></i>
             <span class="text">Estudiante</span>
         </a>
 
         <ul class="side-menu top">
-            <li class="active">
+            <li class="active" data-section="cursos">
                 <a href="#">
                     <i class="bx bxs-dashboard"></i>
                     <span class="text">Cursos</span>
                 </a>
             </li>
 
-            <li>
+            <li data-section="tareas-pendientes">
                 <a href="#">
                     <i class="bx bx-book-content"></i>
                     <span class="text">Tareas Pendientes</span>
                 </a>
             </li>
 
-            <li>
+            <li data-section="notas">
                 <a href="#">
                     <i class="bx bx-pencil"></i>
                     <span class="text">Notas</span>
                 </a>
             </li>
 
-            <li>
+            <li data-section="anuncios">
                 <a href="#">
                     <i class='bx bx-bell'></i>
                     <span class="text">Anuncios</span>
                 </a>
             </li>
 
-            <li>
+            <li data-section="horario">
                 <a href="#">
                     <i class="bx bx-calendar-check"></i>
                     <span class="text">Horario</span>
@@ -65,7 +64,7 @@
             </li>
 
             <li>
-                <a href="#" class="logout">
+                <a href="#" class="logout" id="btnCerrarSesion">
                     <i class="bx bx-right-arrow-alt"></i>
                     <span class="text">Cerrar sesión</span>
                 </a>
@@ -77,54 +76,250 @@
         <nav>
             <i class='bx bx-menu'></i>
             <span class="dashboard-title">Panel Estudiantil | </span>
-            <span class="user">Bienvenido</span>
+            <span class="user" id="userName">Bienvenido, {{ nombre }}</span>
         </nav>
 
         <main>
             <div id="cursos" class="section" style="display:block;">
                 <h3>Cursos</h3>
-                <ul>
-                    <li>Algebra Superior</li>
-                    <li>Programación Para la Ciencia y la Ingeniería I</li>
-                    <li>Física I</li>
+                <ul id="listaCursos">
+                    <li>Cargando cursos...</li>
                 </ul>
             </div>
+
             <div id="tareas-pendientes" class="section" style="display:none;">
                 <h3>Tareas Pendientes</h3>
-                <ul>
-                    <li>Ejercicios de Álgebra (Entrega: 10/04)</li>
-                    <li>Proyecto Django (Entrega: 15/04)</li>
-                    <li>Informe de Física (Entrega: 20/04)</li>
+                <ul id="listaTareas">
+                    <li>Cargando tareas...</li>
                 </ul>
             </div>
+
             <div id="notas" class="section" style="display:none;">
                 <h3>Notas</h3>
-                <p>Álgebra Superior: 85</p>
-                <p>Programación Para la Ciencia y la Ingeniería: 90</p>
-                <p>Física I: 78</p>
-                <p><strong>Promedio General: 84.3</strong></p>
+                <div id="contenedorNotas">
+                    <p>Cargando notas...</p>
+                </div>
+                <div id="promedioGeneral"></div>
             </div>
+
             <div id="anuncios" class="section" style="display:none;">
                 <h3>Anuncios</h3>
-                <ul>
-                    <li>📢 Examen de Algebra Superior el 12/04</li>
-                    <li>📢 Taller de Django el 14/04</li>
-                    <li>📢 No hay clases el 18/04</li>
+                <ul id="listaAnuncios">
+                    <li>Cargando anuncios...</li>
                 </ul>
             </div>
+
             <div id="horario" class="section" style="display:none;">
-                <h3>Horario</h3>
-                <table>
-                    <tr><th>Día</th><th>Curso</th><th>Hora</th></tr>
-                    <tr><td>Lunes</td><td>Algebra Superior</td><td>8:00 - 10:00</td></tr>
-                    <tr><td>Martes</td><td>Programación Para la Ciencia y la Ingeniería I</td><td>10:00 - 12:00</td></tr>
-                    <tr><td>Miércoles</td><td>Física I</td><td>8:00 - 10:00</td></tr>
-                </table>
+                <h3>Horario de Tutorías</h3>
+                <div id="contenedorHorarios">
+                    <p>Cargando horarios...</p>
+                </div>
             </div>
         </main>
     </section>
 
-    <script src="{% static 'js/dashboard.js' %}"></script>
+    <script>
 
+        const carnet = "{{ carnet }}";
+        const csrfToken = "{{ csrf_token }}";
+
+        document.querySelectorAll('[data-section]').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('data-section');
+
+                document.querySelectorAll('.section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.getElementById(sectionId).style.display = 'block';
+
+                document.querySelectorAll('[data-section]').forEach(li => li.classList.remove('active'));
+                this.classList.add('active');
+
+                // Cargar datos según la sección
+                if (sectionId === 'cursos') cargarCursos();
+                if (sectionId === 'tareas-pendientes') cargarTareas();
+                if (sectionId === 'notas') cargarNotas();
+                if (sectionId === 'anuncios') cargarAnuncios();
+                if (sectionId === 'horario') cargarHorarios();
+            });
+        });
+
+        async function cargarCursos() {
+            const lista = document.getElementById('listaCursos');
+            lista.innerHTML = '<li>Cargando cursos...</li>';
+
+            try {
+                const response = await fetch(`/api/estudiante/cursos/${carnet}`);
+                const cursos = await response.json();
+
+                if (cursos.length === 0) {
+                    lista.innerHTML = '<li>No hay cursos inscritos</li>';
+                } else {
+                    lista.innerHTML = cursos.map(curso => `<li>${curso.nombre || curso.codigo}</li>`).join('');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                lista.innerHTML = '<li>Error al cargar cursos</li>';
+            }
+        }
+
+        async function cargarTareas() {
+            const lista = document.getElementById('listaTareas');
+            lista.innerHTML = '<li>Cargando tareas...</li>';
+
+            try {
+                const response = await fetch(`/api/estudiante/tareas/${carnet}`);
+                const tareas = await response.json();
+
+                if (tareas.length === 0) {
+                    lista.innerHTML = '<li>No hay tareas pendientes</li>';
+                } else {
+                    lista.innerHTML = tareas.map(tarea => `<li>${tarea.descripcion} (Entrega: ${tarea.fecha_entrega})</li>`).join('');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                lista.innerHTML = '<li>Error al cargar tareas</li>';
+            }
+        }
+
+        async function cargarNotas() {
+            const contenedor = document.getElementById('contenedorNotas');
+            const promedioDiv = document.getElementById('promedioGeneral');
+            contenedor.innerHTML = '<p>Cargando notas...</p>';
+            promedioDiv.innerHTML = '';
+
+            try {
+                const response = await fetch(`/api/estudiante/notas/${carnet}`);
+                const data = await response.json();
+                const notas = data.notas || [];
+                const cursosInfo = data.cursos || {};
+
+                if (notas.length === 0) {
+                    contenedor.innerHTML = '<p>No hay notas registradas</p>';
+                    return;
+                }
+
+                // Agrupar por curso
+                const notasPorCurso = {};
+                notas.forEach(nota => {
+                    if (!notasPorCurso[nota.curso]) {
+                        notasPorCurso[nota.curso] = [];
+                    }
+                    notasPorCurso[nota.curso].push(nota);
+                });
+
+                let html = '';
+                let todasNotas = [];
+
+                for (const [curso, notasCurso] of Object.entries(notasPorCurso)) {
+                    const nombreCurso = cursosInfo[curso] || curso;
+                    const promedioCurso = (notasCurso.reduce((sum, n) => sum + n.nota, 0) / notasCurso.length).toFixed(1);
+
+                    html += `<div class="curso-notas" style="margin-bottom: 20px;">`;
+                    html += `<h4>${nombreCurso} (Promedio: ${promedioCurso})</h4>`;
+                    html += `<ul>`;
+                    notasCurso.forEach(nota => {
+                        html += `<li>${nota.actividad}: ${nota.nota}</li>`;
+                        todasNotas.push(nota.nota);
+                    });
+                    html += `</ul></div>`;
+                }
+
+                const promedioGeneral = todasNotas.length > 0
+                    ? (todasNotas.reduce((a, b) => a + b, 0) / todasNotas.length).toFixed(1)
+                    : 0;
+
+                contenedor.innerHTML = html;
+                promedioDiv.innerHTML = `<p><strong>Promedio General: ${promedioGeneral}</strong></p>`;
+
+            } catch (error) {
+                console.error('Error:', error);
+                contenedor.innerHTML = '<p>Error al cargar notas</p>';
+            }
+        }
+
+        async function cargarAnuncios() {
+            const lista = document.getElementById('listaAnuncios');
+            lista.innerHTML = '<li>Cargando anuncios...</li>';
+
+            try {
+                const response = await fetch(`/api/estudiante/anuncios`);
+                const anuncios = await response.json();
+
+                if (anuncios.length === 0) {
+                    lista.innerHTML = '<li>No hay anuncios recientes</li>';
+                } else {
+                    lista.innerHTML = anuncios.map(anuncio => `<li>📢 ${anuncio.mensaje} (${anuncio.fecha})</li>`).join('');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                lista.innerHTML = '<li>Error al cargar anuncios</li>';
+            }
+        }
+
+        async function cargarHorarios() {
+            const contenedor = document.getElementById('contenedorHorarios');
+            contenedor.innerHTML = '<p>Cargando horarios...</p>';
+
+            try {
+                const response = await fetch('/api/estudiante/horarios');
+                const horarios = await response.json();
+
+                if (horarios.length === 0) {
+                    contenedor.innerHTML = '<p>No hay horarios de tutoría disponibles</p>';
+                    return;
+                }
+
+                // Agrupar por curso
+                const horariosPorCurso = {};
+                horarios.forEach(h => {
+                    if (!horariosPorCurso[h.curso]) {
+                        horariosPorCurso[h.curso] = [];
+                    }
+                    horariosPorCurso[h.curso].push(h);
+                });
+
+                let html = '';
+                for (const [curso, horariosCurso] of Object.entries(horariosPorCurso)) {
+                    html += `<div style="margin-bottom: 25px;">`;
+                    html += `<h4>Curso: ${curso}</h4>`;
+                    html += `<table border="1" style="border-collapse: collapse; width: 100%;">`;
+                    html += `<thead><tr><th>Horario Inicio</th><th>Horario Fin</th><th>Tutor</th></tr></thead>`;
+                    html += `<tbody>`;
+                    horariosCurso.forEach(h => {
+                        html += `<tr>
+                                    <td>${h.horario_inicio || h.inicio || '--'}</td>
+                                    <td>${h.horario_fin || h.fin || '--'}</td>
+                                    <td>${h.tutor || 'Tutor'}</td>
+                                </tr>`;
+                    });
+                    html += `</tbody></table></div>`;
+                }
+
+                contenedor.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error:', error);
+                contenedor.innerHTML = '<p>Error al cargar horarios</p>';
+            }
+        }
+
+        document.getElementById('btnCerrarSesion')?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await fetch('/logout/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken }
+                });
+                window.location.href = '/';
+            } catch (error) {
+                window.location.href = '/';
+            }
+        });
+        cargarCursos();
+    </script>
+
+    <script src="{% static 'js/dashboard.js' %}"></script>
 </body>
 </html>

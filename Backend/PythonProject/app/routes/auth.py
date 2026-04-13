@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, session
+ffrom flask import Blueprint, request, jsonify, render_template, session
 import os
 import xml.etree.ElementTree as ET
 
@@ -12,6 +12,12 @@ ADMIN_USUARIO = "AdminPPCYL2"
 ADMIN_CONTRASENIA = "AdminPPCYL2771"
 ADMIN_NOMBRE = "Administrador del Sistema"
 
+# Endpoint para mostrar el formulario HTML
+@auth_bp.route("/login-form", methods=["GET"])
+def login_form():
+    return render_template("login.html")
+
+# Endpoint API para validar credenciales
 @auth_bp.route("/login", methods=["POST"])
 def login_api():
     data = request.get_json()
@@ -52,3 +58,9 @@ def login_api():
             return jsonify({"status": "error", "mensaje": str(e)})
 
     return jsonify({"status": "error", "mensaje": "Usuario o contraseña incorrectos"})
+
+
+@auth_bp.route("/logout")
+def logout():
+    session.clear()
+    return jsonify({"status": "ok", "mensaje": "Sesión cerrada"})

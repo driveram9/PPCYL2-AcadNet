@@ -8,7 +8,6 @@ def login_view(request):
         usuario = request.POST.get('usuario')
         contrasenia = request.POST.get('contrasenia')
 
-        # Enviar credenciales al backend
         response = requests.post(f"{BACKEND_URL}/login",
                                  json={"usuario": usuario, "contrasenia": contrasenia})
         data = response.json()

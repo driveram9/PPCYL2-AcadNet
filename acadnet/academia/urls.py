@@ -13,6 +13,7 @@ urlpatterns = [
 
     # APIs para el tutor
     path('api/tutor/horarios', views.api_tutor_horarios, name='api_tutor_horarios'),
+    path('api/tutor/limpiar-horarios', views.api_tutor_limpiar_horarios, name='api_tutor_limpiar_horarios'),
     path('api/tutor/cargar-horarios', views.api_tutor_cargar_horarios, name='api_tutor_cargar_horarios'),
     path('api/tutor/notas', views.api_tutor_notas, name='api_tutor_notas'),
     path('api/tutor/reportes', views.api_tutor_reportes, name='api_tutor_reportes'),

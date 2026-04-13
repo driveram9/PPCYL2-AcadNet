@@ -16,10 +16,7 @@ class MatrizDispersa:
         self.columnas = set() # Carnets
 
     def agregar(self, actividad: str, carnet: str, nota: float) -> bool:
-        """
-        Inserta una nota en la matriz dispersa validando rango.
-        Retorna True si se agregó correctamente, False si no.
-        """
+        """Inserta una nota en la matriz dispersa validando rango."""
         if 0 <= nota <= 100:
             self.datos[(actividad, carnet)] = nota
             self.filas.add(actividad)

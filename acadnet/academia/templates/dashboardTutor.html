@@ -60,6 +60,7 @@
             </pre>
             <input type="file" id="fileHorarios" accept=".xml">
             <button id="btnSubirHorarios">Subir Horarios</button>
+            <button id="btnLimpiarHorarios" style="background:#dc3545; margin-left:10px;">🗑️ Limpiar Todos</button>
             <div id="mensajeHorarios"></div>
         </div>
 
@@ -205,13 +206,36 @@
 
             if (data.success) {
                 document.getElementById('mensajeHorarios').innerHTML = `<p style="color:green">✅ ${data.mensaje}</p>`;
-                cargarHorarios(); // Recargar tabla
-                fileInput.value = ''; // Limpiar input
+                cargarHorarios();
+                fileInput.value = '';
             } else {
                 document.getElementById('mensajeHorarios').innerHTML = `<p style="color:red">❌ ${data.error}</p>`;
             }
         } catch (error) {
             document.getElementById('mensajeHorarios').innerHTML = '<p style="color:red">❌ Error de conexión con el servidor</p>';
+        }
+    });
+
+    // ============================================
+    // FUNCIÓN: LIMPIAR TODOS LOS HORARIOS (NUEVO)
+    // ============================================
+    document.getElementById('btnLimpiarHorarios')?.addEventListener('click', async () => {
+        if (confirm('⚠️ ¿Estás seguro de que deseas eliminar TODOS tus horarios? Esta acción no se puede deshacer.')) {
+            try {
+                const response = await fetch('/api/tutor/limpiar-horarios', {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('mensajeHorarios').innerHTML = '<p style="color:green">✅ Todos los horarios han sido eliminados</p>';
+                    cargarHorarios();
+                } else {
+                    document.getElementById('mensajeHorarios').innerHTML = `<p style="color:red">❌ ${data.error}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('mensajeHorarios').innerHTML = '<p style="color:red">❌ Error de conexión con el servidor</p>';
+            }
         }
     });
 
@@ -248,7 +272,7 @@
                 : `<p style="color:red">❌ ${data.error}</p>`;
 
             if (data.success) {
-                fileInput.value = ''; // Limpiar input
+                fileInput.value = '';
             }
         } catch (error) {
             document.getElementById('mensajeNotas').innerHTML = '<p style="color:red">❌ Error de conexión con el servidor</p>';
@@ -279,7 +303,6 @@
             });
 
             if (actividades.length > 0) {
-                // Gráfico de promedios
                 const ctx1 = document.getElementById('graficoPromedios').getContext('2d');
                 if (chartPromedios) chartPromedios.destroy();
                 chartPromedios = new Chart(ctx1, {

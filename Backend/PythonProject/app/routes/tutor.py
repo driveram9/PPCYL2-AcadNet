@@ -3,6 +3,7 @@ import os
 import xml.etree.ElementTree as ET
 import json
 import re
+from io import StringIO
 
 # Importar matriz dispersa
 import sys
@@ -139,31 +140,61 @@ def api_get_horarios(registro):
 def api_limpiar_horarios(registro):
     """Limpiar todos los horarios de un tutor"""
     try:
-        limpiar_horarios_tutor(registro)
-        return jsonify({"success": True, "mensaje": "Horarios eliminados"}), 200
+        if limpiar_horarios_tutor(registro):
+            return jsonify({"success": True, "mensaje": "Horarios eliminados correctamente"}), 200
+        else:
+            return jsonify({"success": True, "mensaje": "No había horarios para eliminar"}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
 
 @tutor_bp.route("/api/horarios/cargar/<registro>", methods=["POST"])
 def api_cargar_horarios(registro):
-    """Cargar horarios desde archivo XML"""
+    """Cargar horarios desde archivo XML con manejo de codificación"""
     if "archivo_horarios" not in request.files:
         return jsonify({"success": False, "error": "No se envió archivo"}), 400
 
     archivo = request.files["archivo_horarios"]
+
+    if not archivo.filename.endswith('.xml'):
+        return jsonify({"success": False, "error": "El archivo debe ser XML"}), 400
+
     cursos = obtener_cursos_tutor(registro)
     cursos_codigos = [c["codigo"] for c in cursos]
     horarios_procesados = []
 
     try:
-        tree = ET.parse(archivo)
+        # Leer archivo raw
+        raw_content = archivo.read()
+
+        # Intentar diferentes codificaciones
+        texto = None
+        for encoding in ['utf-8-sig', 'utf-8', 'latin-1', 'cp1252']:
+            try:
+                texto = raw_content.decode(encoding)
+                print(f"✅ Archivo decodificado con {encoding}")
+                break
+            except UnicodeDecodeError:
+                continue
+
+        if texto is None:
+            return jsonify({"success": False, "error": "No se pudo decodificar el archivo. Usa UTF-8"}), 400
+
+        # Remover BOM si existe
+        if texto.startswith('\ufeff'):
+            texto = texto[1:]
+
+        # Parsear XML
+        tree = ET.parse(StringIO(texto))
         root = tree.getroot()
 
         for horario_xml in root.findall("horario"):
-            codigo_curso = horario_xml.findtext("curso", "")
-            horario_inicio = horario_xml.findtext("horario_inicio", "")
-            horario_fin = horario_xml.findtext("horario_fin", "")
+            codigo_curso = horario_xml.findtext("curso", "").strip()
+            horario_inicio = horario_xml.findtext("horario_inicio", "").strip()
+            horario_fin = horario_xml.findtext("horario_fin", "").strip()
+
+            if not codigo_curso or not horario_inicio or not horario_fin:
+                continue
 
             if codigo_curso not in cursos_codigos:
                 continue
@@ -182,23 +213,33 @@ def api_cargar_horarios(registro):
 
         if horarios_procesados:
             guardar_horarios_tutor(registro, horarios_procesados)
-            return jsonify({"success": True, "mensaje": f"{len(horarios_procesados)} horarios cargados"})
+            return jsonify({
+                "success": True,
+                "mensaje": f"✅ {len(horarios_procesados)} horarios cargados correctamente"
+            })
         else:
-            return jsonify({"success": False, "error": "No se encontraron horarios válidos"}), 400
+            return jsonify({
+                "success": False,
+                "error": "No se encontraron horarios válidos en el archivo"
+            }), 400
 
-    except ET.ParseError:
-        return jsonify({"success": False, "error": "El archivo no es un XML válido"}), 400
+    except ET.ParseError as e:
+        return jsonify({"success": False, "error": f"Error en el XML: {str(e)}"}), 400
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
 
 @tutor_bp.route("/api/notas/<registro>", methods=["POST"])
 def api_cargar_notas(registro):
-    """Cargar notas desde archivo XML"""
+    """Cargar notas desde archivo XML con manejo de codificación"""
     if "archivo_notas" not in request.files:
         return jsonify({"success": False, "error": "No se envió archivo"}), 400
 
     archivo = request.files["archivo_notas"]
+
+    if not archivo.filename.endswith('.xml'):
+        return jsonify({"success": False, "error": "El archivo debe ser XML"}), 400
+
     cursos = obtener_cursos_tutor(registro)
     cursos_codigos = [c["codigo"] for c in cursos]
     matriz = obtener_matriz_tutor(registro)
@@ -207,54 +248,29 @@ def api_cargar_notas(registro):
     notas_rechazadas = 0
 
     try:
-        tree = ET.parse(archivo)
+        # Leer archivo raw
+        raw_content = archivo.read()
+
+        # Intentar diferentes codificaciones
+        texto = None
+        for encoding in ['utf-8-sig', 'utf-8', 'latin-1', 'cp1252']:
+            try:
+                texto = raw_content.decode(encoding)
+                print(f"✅ Notas decodificado con {encoding}")
+                break
+            except UnicodeDecodeError:
+                continue
+
+        if texto is None:
+            return jsonify({"success": False, "error": "No se pudo decodificar el archivo. Usa UTF-8"}), 400
+
+        # Remover BOM si existe
+        if texto.startswith('\ufeff'):
+            texto = texto[1:]
+
+        # Parsear XML
+        tree = ET.parse(StringIO(texto))
         root = tree.getroot()
 
         for curso in root.findall("curso"):
-            codigo_curso = curso.get("codigo")
-            if codigo_curso not in cursos_codigos:
-                continue
-
-            for actividad in curso.findall("actividad"):
-                nombre_actividad = actividad.get("nombre")
-                for nota_elem in actividad.findall("nota"):
-                    carnet = nota_elem.get("carnet")
-                    try:
-                        nota = float(nota_elem.text)
-                        if matriz.agregar(nombre_actividad, carnet, nota):
-                            notas_agregadas += 1
-                        else:
-                            notas_rechazadas += 1
-                    except ValueError:
-                        notas_rechazadas += 1
-
-        guardar_matriz_tutor(registro)
-        return jsonify(
-            {"success": True, "mensaje": f"{notas_agregadas} notas agregadas, {notas_rechazadas} rechazadas"})
-
-    except ET.ParseError:
-        return jsonify({"success": False, "error": "XML inválido"}), 400
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
-
-
-@tutor_bp.route("/api/reportes/<registro>", methods=["GET"])
-def api_get_reportes(registro):
-    """Obtener datos para reportes"""
-    matriz = obtener_matriz_tutor(registro)
-    actividades = matriz.obtener_todas_actividades()
-
-    promedios = {}
-    for actividad in actividades:
-        promedios[actividad] = round(matriz.promedio_por_actividad(actividad), 2)
-
-    top_data = {}
-    for actividad in actividades:
-        top_notas = matriz.top_notas(actividad)
-        top_data[actividad] = [{"carnet": c, "nota": n} for c, n in top_notas[:10]]
-
-    return jsonify({
-        "actividades": actividades,
-        "promedios": promedios,
-        "top_data": top_data
-    }), 200
+            codigo_curso = curso

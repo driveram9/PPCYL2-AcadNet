@@ -100,6 +100,7 @@ def api_tutor_horarios(request):
 
 @csrf_exempt
 def api_tutor_limpiar_horarios(request):
+    """API para limpiar todos los horarios del tutor"""
     if request.session.get('rol') != 'tutor':
         return JsonResponse({'error': 'No autorizado'}, status=403)
 
@@ -108,9 +109,13 @@ def api_tutor_limpiar_horarios(request):
     if request.method == 'DELETE':
         try:
             response = requests.delete(f"{BACKEND_URL}/horarios/limpiar/{registro}", timeout=5)
-            return JsonResponse(response.json() if response.status_code == 200 else {'success': False})
-        except:
-            return JsonResponse({'success': False, 'error': 'Error de conexión'}, status=500)
+            if response.status_code == 200:
+                data = response.json()
+                return JsonResponse(
+                    {'success': data.get('success', True), 'mensaje': data.get('mensaje', 'Horarios eliminados')})
+            return JsonResponse({'success': False, 'error': 'Error en el backend'}, status=500)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 

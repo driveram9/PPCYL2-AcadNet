@@ -1,135 +1,49 @@
 from django.shortcuts import render, redirect
-import xml.etree.ElementTree as ET
-import os
 
-# Ruta del XML
-RUTA_XML = os.path.join(os.path.dirname(__file__), 'registro.xml')
-
-
-def cargar_datos():
-    if not os.path.exists(RUTA_XML):
-        return None
-
-    tree = ET.parse(RUTA_XML)
-    root = tree.getroot()
-
-    datos = {
-        "estudiantes": {},
-        "tutores": {},
-        "cursos": {},
-        "asignaciones_tutor": {},
-        "asignaciones_estudiante": {}
-    }
-
-    # CURSOS
-    for curso in root.findall(".//curso"):
-        datos["cursos"][curso.get("codigo")] = curso.text
-
-    # TUTORES
-    for tut in root.findall(".//tutor"):
-        datos["tutores"][tut.get("registro_personal")] = {
-            "nombre": tut.text,
-            "contrasenia": tut.get("contrasenia")
-        }
-
-    # ESTUDIANTES
-    for est in root.findall(".//estudiante"):
-        datos["estudiantes"][est.get("carnet")] = {
-            "nombre": est.text,
-            "contrasenia": est.get("contrasenia")
-        }
-
-    # ASIGNACIONES
-    for t in root.findall(".//tutor_curso"):
-        datos["asignaciones_tutor"].setdefault(t.text, []).append(t.get("codigo"))
-
-    for e in root.findall(".//estudiante_curso"):
-        datos["asignaciones_estudiante"].setdefault(e.text, []).append(e.get("codigo"))
-
-    return datos
-
-
-# ==============================
-# LOGIN
-# ==============================
 def login_view(request):
     if request.method == 'POST':
         usuario = request.POST.get('usuario')
         contrasenia = request.POST.get('contrasenia')
 
-        datos = cargar_datos()
+        if usuario == "student" and contrasenia == "1234":
+            return redirect('student')
 
-        # ADMIN
-        if usuario == "AdminPPCYL2" and contrasenia == "AdminPPCYL2771":
-            request.session['rol'] = 'admin'
-            request.session['nombre'] = 'Administrador'
+        elif usuario == "admin" and contrasenia == "1234":
             return redirect('admin')
 
-        # ESTUDIANTE
-        if usuario in datos["estudiantes"]:
-            if contrasenia == datos["estudiantes"][usuario]["contrasenia"]:
-                request.session['rol'] = 'estudiante'
-                request.session['nombre'] = datos["estudiantes"][usuario]["nombre"]
-                request.session['carnet'] = usuario
-                return redirect('student')
+        elif usuario == "tutor" and contrasenia == "1234":
+            return redirect('tutor')
 
-        # TUTOR
-        if usuario in datos["tutores"]:
-            if contrasenia == datos["tutores"][usuario]["contrasenia"]:
-                request.session['rol'] = 'tutor'
-                request.session['nombre'] = datos["tutores"][usuario]["nombre"]
-                request.session['registro'] = usuario
-                return redirect('tutor')
-
-        return render(request, 'login.html', {'error': 'Datos incorrectos'})
+        else:
+            return render(request, 'login.html', {
+                'error': 'Usuario o contraseña incorrecta'
+            })
 
     return render(request, 'login.html')
 
-
-# ==============================
-# DASHBOARDS
-# ==============================
 def dashboard_student(request):
-    if request.session.get('rol') != 'estudiante':
-        return redirect('login')
-
-    datos = cargar_datos()
-    carnet = request.session.get('carnet')
-
-    cursos_codigos = datos["asignaciones_estudiante"].get(carnet, [])
-    cursos = [datos["cursos"][c] for c in cursos_codigos]
-
-    return render(request, 'dashboardStudent.html', {
-        'nombre': request.session.get('nombre'),
-        'cursos': cursos
-    })
-
-
-def dashboard_tutor(request):
-    if request.session.get('rol') != 'tutor':
-        return redirect('login')
-
-    datos = cargar_datos()
-    registro = request.session.get('registro')
-
-    cursos_codigos = datos["asignaciones_tutor"].get(registro, [])
-    cursos = [datos["cursos"][c] for c in cursos_codigos]
-
-    return render(request, 'dashboardTutor.html', {
-        'nombre': request.session.get('nombre'),
-        'cursos': cursos
-    })
-
+    return render(request, 'dashboardStudent.html')
 
 def dashboard_admin(request):
-    if request.session.get('rol') != 'admin':
-        return redirect('login')
+    return render(request, 'dashboardAdmin.html')
 
-    datos = cargar_datos()
+def dashboard_tutor(request):
+    return render(request, 'dashboardTutor.html')
 
-    return render(request, 'dashboardAdmin.html', {
-        'nombre': request.session.get('nombre'),
-        'total_estudiantes': len(datos["estudiantes"]),
-        'total_tutores': len(datos["tutores"]),
-        'total_cursos': len(datos["cursos"]),
-    })
+def upload_view(request):
+    return render(request, 'upload.html')
+
+def tabla_view(request):
+    estudiantes = [
+        {"carnet": "2023001", "nombre": "Juan Pérez", "curso": "Matemática", "nota": 85},
+        {"carnet": "2023002", "nombre": "Ana López", "curso": "Física", "nota": 90},
+        {"carnet": "2023003", "nombre": "Carlos Ruiz", "curso": "Química", "nota": 78},
+    ]
+
+def dashboard_tutor(request):
+    horarios = [
+        {"curso": "Matemática", "inicio": "09:40", "fin": "10:30"},
+        {"curso": "Física", "inicio": "10:30", "fin": "11:20"},
+        ]
+
+    return render(request, 'dashboardTutor.html', {"horarios": horarios})

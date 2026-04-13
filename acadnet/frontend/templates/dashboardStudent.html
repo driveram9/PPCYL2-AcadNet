@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Dashboard</title>
 
-    <link rel="stylesheet" href="{% static 'css/DashboardStudent.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 </head>
@@ -65,7 +65,7 @@
             </li>
 
             <li>
-                <a href="#">
+                <a href="#" class="logout">
                     <i class="bx bx-right-arrow-alt"></i>
                     <span class="text">Cerrar sesión</span>
                 </a>
@@ -81,21 +81,15 @@
         </nav>
 
         <main>
-            <div id="cursos" class="section">
+            <div id="cursos" class="section" style="display:block;">
                 <h3>Cursos</h3>
                 <ul>
-                    <li>Matemáticas Avanzadas</li>
-                    <li>Programación en Python</li>
-                    <li>Física Aplicada</li>
+                    <li>Algebra Superior</li>
+                    <li>Programación Para la Ciencia y la Ingeniería I</li>
+                    <li>Física I</li>
                 </ul>
             </div>
-            <div class="cards">
-                <div class="card">
-                    <h3>Tareas</h3>
-                    <p>5 pendientes</p>
-                </div>
-            </div>
-            <div id="tareas" class="section" style="dlisplay:none;">
+            <div id="tareas-pendientes" class="section" style="display:none;">
                 <h3>Tareas Pendientes</h3>
                 <ul>
                     <li>Ejercicios de Álgebra (Entrega: 10/04)</li>
@@ -110,7 +104,7 @@
                 <p>Física I: 78</p>
                 <p><strong>Promedio General: 84.3</strong></p>
             </div>
-            <div id="anuncios" class="section" style="dlisplay:none;">
+            <div id="anuncios" class="section" style="display:none;">
                 <h3>Anuncios</h3>
                 <ul>
                     <li>📢 Examen de Algebra Superior el 12/04</li>
@@ -130,7 +124,7 @@
         </main>
     </section>
 
-    <script src="{% static 'js/dashboardStudent.js' %}"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
 
 </body>
 </html>

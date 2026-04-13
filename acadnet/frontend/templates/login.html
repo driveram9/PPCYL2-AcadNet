@@ -18,12 +18,12 @@
     <div class="wrapper">
         <form method="POST">
             {% csrf_token %}
-            <h1>Login</h1>
+            <h1>AcadNet</h1>
             {% if error %}
             <p style="color:red;">{{ error }}</p>
             {% endif %}
             <div class="input-box">
-                <input type="text" name="usuario" placeholder="Correo" required>
+                <input type="text" name="usuario" placeholder="Registro Personal" required>
                 <i class="bx bx-user-circle" /></i>
             </div>
             <div class="input-box">
@@ -38,9 +38,6 @@
 
             <button type="submit" class="btn">Login</button>
 
-            <div class="register-link">
-                <p>¿Aun no tienes una cuenta? <a href="#">Registrate</a></p>
-            </div>
         </form>
     </div>
 

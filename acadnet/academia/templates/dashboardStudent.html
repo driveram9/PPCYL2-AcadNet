@@ -307,9 +307,31 @@
             }
         });
 
-        // Cargar cursos al iniciar
         cargarCursos();
     </script>
+
+    
+    <section id="configuraciones">
+    <h1>Configuraciones</h1>
+
+    <div class="config-section" id="apuntes">
+      <h2>Apuntes</h2>
+      <textarea placeholder="Escribe tus apuntes aquí..."></textarea>
+    </div>
+
+    <div class="config-section" id="ayuda">
+      <h2>Ayuda</h2>
+      <p>¿Necesitas soporte? Aquí puedes encontrar guías y preguntas frecuentes.</p>
+      <button>Ver Guía</button>
+      <button>Preguntas Frecuentes</button>
+    </div>
+
+    <div class="config-section" id="modo">
+      <h2>Modo de visualización</h2>
+      <label for="toggle-modo">Cambiar a modo oscuro:</label>
+      <input type="checkbox" id="toggle-modo">
+    </div>
+  </section>
 
     <script src="{% static 'js/dashboard.js' %}"></script>
 </body>

@@ -15,17 +15,23 @@ from matrices.matriz_dispersa import MatrizDispersa
 tutor_bp = Blueprint("tutor", __name__)
 
 # ============================================
-# CONFIGURACIÓN
+# CONFIGURACIÓN (CORREGIDA)
 # ============================================
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 HORARIOS_FOLDER = os.path.join(UPLOAD_FOLDER, "horarios")
 NOTAS_FOLDER = os.path.join(UPLOAD_FOLDER, "notas")
-XML_PATH = os.path.join(UPLOAD_FOLDER, "registro.xml")
+
+# ✅ XML en la raíz de app (no dentro de uploads)
+XML_PATH = os.path.join(BASE_DIR, "registro.xml")
 
 # Crear carpetas
 os.makedirs(HORARIOS_FOLDER, exist_ok=True)
 os.makedirs(NOTAS_FOLDER, exist_ok=True)
+
+# Debug - mostrar ruta del XML al iniciar
+print(f"📁 XML_PATH: {XML_PATH}")
+print(f"📁 ¿Existe XML? {os.path.exists(XML_PATH)}")
 
 # Diccionario global para matrices dispersas
 matrices_notas = {}
@@ -39,6 +45,7 @@ def obtener_cursos_tutor(registro_personal):
     """Obtiene los cursos asignados a un tutor desde el XML"""
     cursos = []
     if not os.path.exists(XML_PATH):
+        print(f"❌ XML no encontrado en: {XML_PATH}")
         return cursos
 
     try:
@@ -164,8 +171,6 @@ def estudiante_en_curso(carnet, codigo_curso):
 
 def obtener_fecha_nota(registro_tutor, actividad, carnet):
     """Obtener la fecha de cuando se registró la nota"""
-    # Podrías almacenar fechas en un archivo aparte
-    # Por ahora, retornamos la fecha actual
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 

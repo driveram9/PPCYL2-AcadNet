@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import json
 import re
 from io import StringIO
+import datetime
 
 # Importar matriz dispersa
 import sys
@@ -116,6 +117,56 @@ def guardar_matriz_tutor(registro_personal):
         nota_file = os.path.join(NOTAS_FOLDER, f"{registro_personal}.json")
         with open(nota_file, "w", encoding="utf-8") as f:
             json.dump(matriz.to_dict(), f, indent=2, ensure_ascii=False)
+
+
+# ============================================
+# NUEVAS FUNCIONES PARA ESTUDIANTES
+# ============================================
+
+def obtener_info_tutor(registro_personal):
+    """Obtener información de un tutor por su registro"""
+    if not os.path.exists(XML_PATH):
+        return {"nombre": "Desconocido", "registro": registro_personal}
+
+    try:
+        tree = ET.parse(XML_PATH)
+        root = tree.getroot()
+
+        for tutor in root.findall("tutores/tutor"):
+            if tutor.get("registro_personal") == registro_personal:
+                return {
+                    "nombre": tutor.text.strip() if tutor.text else "Desconocido",
+                    "registro": registro_personal
+                }
+    except:
+        pass
+
+    return {"nombre": "Desconocido", "registro": registro_personal}
+
+
+def estudiante_en_curso(carnet, codigo_curso):
+    """Verifica si un estudiante está inscrito en un curso"""
+    if not os.path.exists(XML_PATH):
+        return False
+
+    try:
+        tree = ET.parse(XML_PATH)
+        root = tree.getroot()
+
+        for ec in root.findall("asignaciones/c_estudiante/estudiante_curso"):
+            if ec.get("codigo") == codigo_curso and ec.text == carnet:
+                return True
+    except:
+        pass
+
+    return False
+
+
+def obtener_fecha_nota(registro_tutor, actividad, carnet):
+    """Obtener la fecha de cuando se registró la nota"""
+    # Podrías almacenar fechas en un archivo aparte
+    # Por ahora, retornamos la fecha actual
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 # ============================================
@@ -374,3 +425,53 @@ def api_get_reportes(registro):
         "promedios": promedios,
         "top_data": top_data
     }), 200
+
+
+# ============================================
+# NUEVA RUTA PARA ESTUDIANTES (VER NOTAS)
+# ============================================
+
+@tutor_bp.route("/api/notas/estudiante/<carnet>", methods=["GET"])
+def api_get_notas_estudiante(carnet):
+    """Obtener todas las notas de un estudiante específico"""
+    print("=" * 50)
+    print("🔍 BUSCANDO NOTAS PARA ESTUDIANTE")
+    print(f"Carnet: {carnet}")
+
+    # Buscar en todas las matrices de tutores
+    todas_notas = []
+
+    for registro_personal, matriz in matrices_notas.items():
+        # Obtener notas del estudiante en esta matriz
+        notas_estudiante = matriz.obtener_por_estudiante(carnet)
+
+        if notas_estudiante:
+            print(f"📌 Notas encontradas en tutor: {registro_personal}")
+            # Obtener información del tutor
+            tutor_info = obtener_info_tutor(registro_personal)
+            cursos_tutor = obtener_cursos_tutor(registro_personal)
+
+            for actividad, nota in notas_estudiante.items():
+                # Determinar a qué curso pertenece esta actividad
+                curso_asignado = None
+                for curso in cursos_tutor:
+                    # Buscar si el estudiante está en ese curso
+                    if estudiante_en_curso(carnet, curso["codigo"]):
+                        curso_asignado = curso
+                        break
+
+                todas_notas.append({
+                    "tutor": tutor_info["nombre"],
+                    "tutor_registro": registro_personal,
+                    "curso": curso_asignado["codigo"] if curso_asignado else "Desconocido",
+                    "curso_nombre": curso_asignado["nombre"] if curso_asignado else "Desconocido",
+                    "actividad": actividad,
+                    "nota": nota,
+                    "fecha": obtener_fecha_nota(registro_personal, actividad, carnet)
+                })
+
+    # Ordenar por fecha (más reciente primero)
+    todas_notas.sort(key=lambda x: x.get("fecha", ""), reverse=True)
+
+    print(f"✅ Total notas encontradas: {len(todas_notas)}")
+    return jsonify(todas_notas), 200

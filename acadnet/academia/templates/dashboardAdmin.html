@@ -5,11 +5,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Dashboard</title>
-
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-
+    <title>Dashboard Administrador</title>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
+
+        #sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100%;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 20px 20px;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            border-bottom: 1px solid #333;
+            margin-bottom: 20px;
+        }
+
+        .side-menu {
+            list-style: none;
+        }
+
+        .side-menu li {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .side-menu li:hover, .side-menu li.active {
+            background: #0f3460;
+        }
+
+        .side-menu li a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h3 { margin-bottom: 20px; color: #333; }
+        h4 { margin: 15px 0 10px; color: #555; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 10px 0 0;
+        }
+
+        button:hover { opacity: 0.9; }
+        .btn-danger { background: #dc3545; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-info { background: #17a2b8; }
+
+        input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 400px;
+            margin: 10px 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 400px;
+            font-family: monospace;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .loading { text-align: center; padding: 20px; color: #666; }
+        .error { color: red; padding: 10px; background: #fee; border-radius: 5px; margin: 10px 0; }
+        .success { color: green; padding: 10px; background: #efe; border-radius: 5px; margin: 10px 0; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,108 +161,374 @@
             <span class="text">Administrador</span>
         </a>
         <ul class="side-menu top">
-            <li class="active">
-                <a href="#">
-                    <i class="bx bxs-dashboard"></i>
-                    <span class="text">Gestion de Cursos</span>
-                </a>
+            <li class="active" data-section="gestion-cursos">
+                <a href="#"><i class="bx bxs-dashboard"></i><span class="text">Gestión de Cursos</span></a>
             </li>
-            <li>
-                <a href="#">
-                    <i class="bx bx-book-content"></i>
-                    <span class="text">Tutores</span>
-                </a>
+            <li data-section="tutores">
+                <a href="#"><i class="bx bx-book-content"></i><span class="text">Tutores</span></a>
             </li>
-            <li>
-                <a href="#">
-                    <i class="bx bx-pencil"></i>
-                    <span class="text">Estudiantes</span>
-                </a>
+            <li data-section="estudiantes">
+                <a href="#"><i class="bx bx-pencil"></i><span class="text">Estudiantes</span></a>
             </li>
-            <li>
-                <a href="#">
-                    <i class='bx bx-bell'></i>
-                    <span class="text">Mensajes</span>
-                </a>
+            <li data-section="upload">
+                <a href="#"><i class="bx bx-upload"></i><span class="text">Cargar XML</span></a>
             </li>
-            <li>
-                <a href="#">
-                    <i class="bx bx-calendar-check"></i>
-                    <span class="text">Fechas Importantes</span></i>
-                </a>
+            <li data-section="editar-xml">
+                <a href="#"><i class="bx bx-edit"></i><span class="text">Editar XML</span></a>
             </li>
         </ul>
         <ul class="side-menu">
             <li>
-                <a href="#">
-                    <i class="bx bx-cog"></i>
-                    <span class="text">Configuraciones</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" class="logout">
+                <a href="/logout" class="logout">
                     <i class="bx bx-right-arrow-alt"></i>
-                    <span class="text">Cerrar seción</span>
+                    <span class="text">Cerrar sesión</span>
                 </a>
             </li>
         </ul>
     </section>
 
     <section id="content">
-
         <main>
-            <div id="gestion-de-cursos" class="section">
-                <h3>Cursos Activos</h3>
-                <ul>
-                    <li>📘 Matemáticas Avanzadas – 45 estudiantes inscritos</li>
-                    <li>💻 Programación en Python – 60 estudiantes inscritos</li>
-                    <li>🔬 Física Aplicada – 40 estudiantes inscritos</li>
-                </ul>
-                <h3>Panel del Administrador</h3>
-                    <a href="/upload/">
-                        <button>Subir XML</button>
-                    </a>
+            <!-- Sección: Gestión de Cursos -->
+            <div id="gestion-cursos" class="section">
+                <h3>📚 Gestión de Cursos</h3>
+                <button id="btnCargarCursos" class="btn-info">🔄 Cargar Cursos</button>
+                <div id="cursosLista" class="loading">Cargando cursos...</div>
+            </div>
 
-                    <a href="/tabla/">
-                        <button>Ver Tabla</button>
-                    </a>
-            </div>
+            <!-- Sección: Tutores -->
             <div id="tutores" class="section" style="display:none;">
-                <h3>Lista de Tutores Actuales</h3>
-                <ul>
-                    <li> Ana López – Álgebra Superior</li>
-                    <li> Carlos Arias – Programación Para la Ciencia y la Ingeniería I</li>
-                    <li> María González – Física I</li>
-                </ul>
+                <h3>👨‍🏫 Tutores Registrados</h3>
+                <button id="btnCargarTutores" class="btn-info">🔄 Cargar Tutores</button>
+                <div id="tutoresLista" class="loading">Cargando tutores...</div>
             </div>
+
+            <!-- Sección: Estudiantes -->
             <div id="estudiantes" class="section" style="display:none;">
-                <h3>Lista de Estudiantes Actuales</h3>
-                <li> Laura Martínez – Álgebra Superior</li>
-                <li> Pedro Hernández – Programación Para la Ciencia y la Ingeniería I</li>
-                <li> Sofía Castillo – Física I</li>
+                <h3>🎓 Estudiantes Registrados</h3>
+                <button id="btnCargarEstudiantes" class="btn-info">🔄 Cargar Estudiantes</button>
+                <div id="estudiantesLista" class="loading">Cargando estudiantes...</div>
             </div>
-            <div id="mensajes" class="section" style="display:none;">
-                <h3>Mensajes Nuevos!!</h3>
-                <ul>
-                    <li>📢 Reunión de coordinación el lunes a las 9:00 AM</li>
-                    <li>📢 Actualización de la plataforma el miércoles</li>
-                    <li>📢 Entrega de reportes trimestrales antes del 20/04</li>
-                </ul>
+
+            <!-- Sección: Cargar XML -->
+            <div id="upload" class="section" style="display:none;">
+                <h3>📤 Cargar Archivo XML</h3>
+                <p>Selecciona un archivo XML con la estructura de cursos, tutores y estudiantes.</p>
+                <input type="file" id="fileXml" accept=".xml">
+                <button id="btnSubirXml">Subir Archivo</button>
+                <button id="btnProcesarXml" class="btn-info">📊 Procesar Estadísticas</button>
+                <button id="btnLimpiarXml" class="btn-danger">🗑️ Limpiar Datos</button>
+                <div id="mensajeXml"></div>
+                <div id="estadisticasXml" style="display:none;">
+                    <h4>📈 Estadísticas del Archivo</h4>
+                    <div id="statsContent"></div>
+                </div>
             </div>
-            <div id="fechas-importantes" class="section" style="display:none;">
-                <h3>Fechas Importantes</h3>
-                <table>
-                    <tr><th>Evento</th><th>Fecha</th></tr>
-                    <tr><td>Inicio de inscripciones</td><td>15/04/2026</td></tr>
-                    <tr><td>Examen final de Matemáticas</td><td> 25/04/2026</td></tr>
-                    <tr><td>Cierre de ciclo académico</td><td>30/04/2026</td></tr>
-                </table>
+
+            <!-- Sección: Editar XML -->
+            <div id="editar-xml" class="section" style="display:none;">
+                <h3>✏️ Editar XML</h3>
+                <button id="btnCargarXmlEditar" class="btn-info">📂 Cargar XML</button>
+                <button id="btnGuardarXml" class="btn-success" style="display:none;">💾 Guardar Cambios</button>
+                <textarea id="xmlEditor" placeholder="El XML se cargará aquí..." style="display:none;"></textarea>
+                <div id="mensajeEditor"></div>
             </div>
         </main>
     </section>
 
-    <script src="{% static 'js/dashboard.js' %}"></script>
-    
+    <script>
+        // ============================================
+        // MENÚ - CAMBIO DE SECCIONES
+        // ============================================
+        document.querySelectorAll('[data-section]').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('data-section');
+                document.querySelectorAll('.section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.getElementById(sectionId).style.display = 'block';
+
+                document.querySelectorAll('[data-section]').forEach(li => li.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // ============================================
+        // FUNCIONES COMUNES
+        // ============================================
+        function mostrarMensaje(elementId, mensaje, esError = false) {
+            const div = document.getElementById(elementId);
+            div.innerHTML = `<div class="${esError ? 'error' : 'success'}">${mensaje}</div>`;
+            setTimeout(() => { if (div) div.innerHTML = ''; }, 5000);
+        }
+
+        // ============================================
+        // CARGAR CURSOS
+        // ============================================
+        async function cargarCursos() {
+            const container = document.getElementById('cursosLista');
+            container.innerHTML = '<div class="loading">Cargando cursos...</div>';
+
+            try {
+                const response = await fetch('/api/admin/cursos');
+                const cursos = await response.json();
+
+                if (cursos.length === 0) {
+                    container.innerHTML = '<div class="error">No hay cursos registrados. Carga un archivo XML primero.</div>';
+                } else {
+                    let html = '<table><thead><tr><th>Código</th><th>Nombre del Curso</th></tr></thead><tbody>';
+                    cursos.forEach(c => {
+                        html += `<tr><td><strong>${c.codigo}</strong></td><td>${c.nombre}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error al cargar cursos</div>';
+            }
+        }
+
+        document.getElementById('btnCargarCursos')?.addEventListener('click', cargarCursos);
+        cargarCursos(); // Carga inicial
+
+        // ============================================
+        // CARGAR TUTORES
+        // ============================================
+        async function cargarTutores() {
+            const container = document.getElementById('tutoresLista');
+            container.innerHTML = '<div class="loading">Cargando tutores...</div>';
+
+            try {
+                const response = await fetch('/api/admin/tutores');
+                const tutores = await response.json();
+
+                if (tutores.length === 0) {
+                    container.innerHTML = '<div class="error">No hay tutores registrados.</div>';
+                } else {
+                    let html = '<table><thead><tr><th>Registro</th><th>Nombre</th><th>Contraseña</th><th>Cursos Asignados</th></tr></thead><tbody>';
+                    tutores.forEach(t => {
+                        html += `<tr>
+                            <td><strong>${t.registro}</strong></td>
+                            <td>${t.nombre}</td>
+                            <td>${t.contrasenia}</td>
+                            <td>${t.cursos.join(', ') || 'Ninguno'}</td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error al cargar tutores</div>';
+            }
+        }
+
+        document.getElementById('btnCargarTutores')?.addEventListener('click', cargarTutores);
+
+        // ============================================
+        // CARGAR ESTUDIANTES
+        // ============================================
+        async function cargarEstudiantes() {
+            const container = document.getElementById('estudiantesLista');
+            container.innerHTML = '<div class="loading">Cargando estudiantes...</div>';
+
+            try {
+                const response = await fetch('/api/admin/estudiantes');
+                const estudiantes = await response.json();
+
+                if (estudiantes.length === 0) {
+                    container.innerHTML = '<div class="error">No hay estudiantes registrados.</div>';
+                } else {
+                    let html = '<table><thead><tr><th>Carnet</th><th>Nombre</th><th>Contraseña</th><th>Cursos Asignados</th></tr></thead><tbody>';
+                    estudiantes.forEach(e => {
+                        html += `<tr>
+                            <td><strong>${e.carnet}</strong></td>
+                            <td>${e.nombre}</td>
+                            <td>${e.contrasenia}</td>
+                            <td>${e.cursos.join(', ') || 'Ninguno'}</td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error al cargar estudiantes</div>';
+            }
+        }
+
+        document.getElementById('btnCargarEstudiantes')?.addEventListener('click', cargarEstudiantes);
+
+        // ============================================
+        // SUBIR XML
+        // ============================================
+        document.getElementById('btnSubirXml')?.addEventListener('click', async () => {
+            const fileInput = document.getElementById('fileXml');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                mostrarMensaje('mensajeXml', '❌ Selecciona un archivo XML', true);
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('archivo', file);
+
+            mostrarMensaje('mensajeXml', '⏳ Subiendo archivo...');
+
+            try {
+                const response = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarMensaje('mensajeXml', `✅ ${data.mensaje}`);
+                    fileInput.value = '';
+                } else {
+                    mostrarMensaje('mensajeXml', `❌ ${data.error}`, true);
+                }
+            } catch (error) {
+                mostrarMensaje('mensajeXml', '❌ Error de conexión', true);
+            }
+        });
+
+        // ============================================
+        // PROCESAR XML
+        // ============================================
+        document.getElementById('btnProcesarXml')?.addEventListener('click', async () => {
+            const statsDiv = document.getElementById('estadisticasXml');
+            statsDiv.style.display = 'block';
+            document.getElementById('statsContent').innerHTML = '<div class="loading">Procesando...</div>';
+
+            try {
+                const response = await fetch('/api/admin/procesar');
+                const data = await response.json();
+
+                if (data.success) {
+                    let html = `
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="number">${data.cursos.total}</div>
+                                <div>Cursos</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">${data.tutores.total}</div>
+                                <div>Tutores</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="number">${data.estudiantes.total}</div>
+                                <div>Estudiantes</div>
+                            </div>
+                        </div>
+                        <h4>📋 Asignaciones de Tutores</h4>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="number">${data.tutores.total_asignaciones}</div>
+                                <div>Total Asignaciones</div>
+                            </div>
+                            <div class="stat-card" style="background:#d4edda;">
+                                <div class="number" style="color:#155724;">${data.tutores.correctos}</div>
+                                <div>Correctas</div>
+                            </div>
+                            <div class="stat-card" style="background:#f8d7da;">
+                                <div class="number" style="color:#721c24;">${data.tutores.incorrectos}</div>
+                                <div>Incorrectas</div>
+                            </div>
+                        </div>
+                        <h4>📋 Asignaciones de Estudiantes</h4>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="number">${data.estudiantes.total_asignaciones}</div>
+                                <div>Total Asignaciones</div>
+                            </div>
+                            <div class="stat-card" style="background:#d4edda;">
+                                <div class="number" style="color:#155724;">${data.estudiantes.correctos}</div>
+                                <div>Correctas</div>
+                            </div>
+                            <div class="stat-card" style="background:#f8d7da;">
+                                <div class="number" style="color:#721c24;">${data.estudiantes.incorrectos}</div>
+                                <div>Incorrectas</div>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('statsContent').innerHTML = html;
+                    mostrarMensaje('mensajeXml', '✅ Estadísticas procesadas');
+                } else {
+                    document.getElementById('statsContent').innerHTML = `<div class="error">${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('statsContent').innerHTML = '<div class="error">Error al procesar</div>';
+            }
+        });
+
+        // ============================================
+        // LIMPIAR XML
+        // ============================================
+        document.getElementById('btnLimpiarXml')?.addEventListener('click', async () => {
+            if (confirm('⚠️ ¿Estás seguro de que deseas eliminar el archivo XML? Esta acción no se puede deshacer.')) {
+                try {
+                    const response = await fetch('/api/admin/limpiar', { method: 'DELETE' });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        mostrarMensaje('mensajeXml', `✅ ${data.mensaje}`);
+                        document.getElementById('estadisticasXml').style.display = 'none';
+                    } else {
+                        mostrarMensaje('mensajeXml', `❌ ${data.error}`, true);
+                    }
+                } catch (error) {
+                    mostrarMensaje('mensajeXml', '❌ Error de conexión', true);
+                }
+            }
+        });
+
+        // ============================================
+        // EDITAR XML
+        // ============================================
+        document.getElementById('btnCargarXmlEditar')?.addEventListener('click', async () => {
+            const editor = document.getElementById('xmlEditor');
+            const guardarBtn = document.getElementById('btnGuardarXml');
+
+            editor.style.display = 'block';
+            editor.value = 'Cargando...';
+            guardarBtn.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/admin/xml');
+                const data = await response.json();
+
+                if (data.success) {
+                    editor.value = data.contenido;
+                    guardarBtn.style.display = 'inline-block';
+                    mostrarMensaje('mensajeEditor', '✅ XML cargado para edición');
+                } else {
+                    editor.value = 'No hay archivo XML cargado. Sube uno primero.';
+                    mostrarMensaje('mensajeEditor', `❌ ${data.error}`, true);
+                }
+            } catch (error) {
+                editor.value = 'Error al cargar el XML';
+                mostrarMensaje('mensajeEditor', '❌ Error de conexión', true);
+            }
+        });
+
+        document.getElementById('btnGuardarXml')?.addEventListener('click', async () => {
+            const contenido = document.getElementById('xmlEditor').value;
+
+            try {
+                const response = await fetch('/api/admin/xml', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contenido: contenido })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarMensaje('mensajeEditor', `✅ ${data.mensaje}`);
+                } else {
+                    mostrarMensaje('mensajeEditor', `❌ ${data.error}`, true);
+                }
+            } catch (error) {
+                mostrarMensaje('mensajeEditor', '❌ Error de conexión', true);
+            }
+        });
+    </script>
 </body>
-</html>
 </html>

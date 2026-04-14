@@ -241,6 +241,166 @@ def api_estudiante_horarios(request):
         return JsonResponse([], safe=False)
     except Exception as e:
         return JsonResponse([], safe=False)
+
+
+# ============================================
+# VISTAS DEL ADMINISTRADOR
+# ============================================
+
+def admin_dashboard(request):
+    """Dashboard del administrador"""
+    if request.session.get('rol') != 'admin':
+        return redirect('login')
+
+    return render(request, 'dashboardAdmin.html', {
+        'nombre': request.session.get('nombre'),
+        'usuario': request.session.get('usuario')
+    })
+
+
+def admin_upload(request):
+    """Página para subir XML"""
+    if request.session.get('rol') != 'admin':
+        return redirect('login')
+
+    return render(request, 'admin/upload.html')
+
+
+def admin_ver_usuarios(request):
+    """Página para ver usuarios"""
+    if request.session.get('rol') != 'admin':
+        return redirect('login')
+
+    return render(request, 'admin/ver_usuarios.html')
+
+
+# ============================================
+# APIS DEL ADMINISTRADOR (Django → Flask)
+# ============================================
+
+@csrf_exempt
+def api_admin_cursos(request):
+    """API para obtener cursos"""
+    if request.session.get('rol') != 'admin':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+    try:
+        response = requests.get(f"{BACKEND_URL}/admin/cursos", timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json(), safe=False)
+        return JsonResponse([], safe=False)
+    except:
+        return JsonResponse([], safe=False)
+
+
+@csrf_exempt
+def api_admin_tutores(request):
+    """API para obtener tutores"""
+    if request.session.get('rol') != 'admin':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+    try:
+        response = requests.get(f"{BACKEND_URL}/admin/tutores", timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json(), safe=False)
+        return JsonResponse([], safe=False)
+    except:
+        return JsonResponse([], safe=False)
+
+
+@csrf_exempt
+def api_admin_estudiantes(request):
+    """API para obtener estudiantes"""
+    if request.session.get('rol') != 'admin':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+    try:
+        response = requests.get(f"{BACKEND_URL}/admin/estudiantes", timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json(), safe=False)
+        return JsonResponse([], safe=False)
+    except:
+        return JsonResponse([], safe=False)
+
+
+@csrf_exempt
+def api_admin_upload(request):
+    """API para subir archivo XML"""
+    if request.session.get('rol') != 'admin':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+    if request.method == 'POST' and request.FILES.get('archivo'):
+        archivo = request.FILES['archivo']
+
+        try:
+            files = {'archivo': archivo}
+            response = requests.post(f"{BACKEND_URL}/admin/upload", files=files, timeout=30)
+            if response.status_code == 200:
+                data = response.json()
+                return JsonResponse(data)
+            return JsonResponse({'success': False, 'error': 'Error en el backend'}, status=500)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+@csrf_exempt
+def api_admin_procesar(request):
+    """API para procesar XML y obtener estadísticas"""
+    if request.session.get('rol') != 'admin':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+    try:
+        response = requests.get(f"{BACKEND_URL}/admin/procesar", timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json())
+        return JsonResponse({'success': False, 'error': 'Error en el backend'}, status=500)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def api_admin_xml(request):
+    """API para obtener/guardar contenido XML"""
+    if request.session.get('rol') != 'admin':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+    if request.method == 'GET':
+        try:
+            response = requests.get(f"{BACKEND_URL}/admin/xml", timeout=5)
+            if response.status_code == 200:
+                return JsonResponse(response.json())
+            return JsonResponse({'success': False, 'error': 'No hay archivo'}, status=404)
+        except:
+            return JsonResponse({'success': False, 'error': 'Error de conexión'}, status=500)
+
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        try:
+            response = requests.put(f"{BACKEND_URL}/admin/xml", json=data, timeout=5)
+            if response.status_code == 200:
+                return JsonResponse(response.json())
+            return JsonResponse({'success': False, 'error': 'Error al guardar'}, status=500)
+        except:
+            return JsonResponse({'success': False, 'error': 'Error de conexión'}, status=500)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+@csrf_exempt
+def api_admin_limpiar(request):
+    """API para limpiar archivo XML"""
+    if request.session.get('rol') != 'admin':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+    try:
+        response = requests.delete(f"{BACKEND_URL}/admin/limpiar", timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json())
+        return JsonResponse({'success': False, 'error': 'Error en el backend'}, status=500)
+    except:
+        return JsonResponse({'success': False, 'error': 'Error de conexión'}, status=500)
 #Arrancar el frontend
 #cd acadnet
 #python manage.py runserver

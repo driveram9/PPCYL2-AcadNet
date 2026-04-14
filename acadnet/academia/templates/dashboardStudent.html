@@ -56,6 +56,7 @@
         </ul>
 
         <ul class="side-menu">
+            <!-- ✅ CORRECCIÓN 1: Agregar data-section="configuraciones" -->
             <li data-section="configuraciones">
                 <a href="#">
                     <i class="bx bx-cog"></i>
@@ -110,7 +111,7 @@
           </div>
         </div>
     
-        <!-- Aquí agregamos Configuraciones -->
+        <!-- Sección Configuraciones -->
         <div id="configuraciones" class="section" style="display:none;">
           <h3>Configuraciones</h3>
     
@@ -135,11 +136,11 @@
       </main>
     </section>
 
-
     <script>
         const carnet = "{{ carnet }}";
         const csrfToken = "{{ csrf_token }}";
 
+        // ✅ CORRECCIÓN 2: Agregar manejo para la sección de configuraciones
         document.querySelectorAll('[data-section]').forEach(item => {
             item.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -148,16 +149,23 @@
                 document.querySelectorAll('.section').forEach(section => {
                     section.style.display = 'none';
                 });
-                document.getElementById(sectionId).style.display = 'block';
+                
+                // Mostrar la sección seleccionada
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                }
 
                 document.querySelectorAll('[data-section]').forEach(li => li.classList.remove('active'));
                 this.classList.add('active');
 
+                // Cargar datos según la sección
                 if (sectionId === 'cursos') cargarCursos();
                 if (sectionId === 'tareas-pendientes') cargarTareas();
                 if (sectionId === 'notas') cargarNotas();
                 if (sectionId === 'anuncios') cargarAnuncios();
                 if (sectionId === 'horario') cargarHorarios();
+                // ✅ Agregar condición para configuraciones (no necesita cargar datos)
                 if (sectionId === 'configuraciones') {
                     console.log('Sección de configuraciones cargada');
                 }

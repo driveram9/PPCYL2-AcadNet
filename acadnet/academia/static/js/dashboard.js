@@ -15,17 +15,13 @@ const sections = document.querySelectorAll('main .section');
 
 menuItems.forEach(item => {
     item.addEventListener('click', function (e) {
-        e.preventDefault();
-        // Ocultar todas las secciones
+        e.preventDefault() 
         sections.forEach(sec => sec.style.display = 'none');
 
-        // Quitar la clase active de todos
         menuItems.forEach(i => i.parentElement.classList.remove('active'));
 
-        // Activar el clic actual
         this.parentElement.classList.add('active');
 
-        // Mostrar la sección correspondiente
         const texto = this.querySelector('.text').textContent
             .toLowerCase()
                 .replace(/\s+/g, '-');
@@ -34,3 +30,13 @@ menuItems.forEach(item => {
     });
 });
 
+
+const toggleModo = document.getElementById('toggle-modo');
+
+toggleModo.addEventListener('change', function () {
+    if (this.checked) {
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+    }
+});

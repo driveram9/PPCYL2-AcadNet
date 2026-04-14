@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import requests
+import json
 
 BACKEND_URL = "http://localhost:5000/api"
 
@@ -15,6 +16,7 @@ def login_view(request):
         if usuario == "AdminPPCYL2" and contrasenia == "AdminPPCYL2771":
             request.session['rol'] = 'admin'
             request.session['nombre'] = 'Administrador del Sistema'
+            request.session['usuario'] = usuario
             return redirect('admin_dashboard')
 
         # Consultar backend
@@ -55,10 +57,20 @@ def admin_dashboard(request):
 
 
 def estudiante_dashboard(request):
+    """Dashboard para estudiantes - Ver notas"""
     if request.session.get('rol') != 'estudiante':
         return redirect('login')
-    return render(request, 'dashboardStudent.html',
-                  {'nombre': request.session.get('nombre'), 'carnet': request.session.get('carnet')})
+    
+    carnet = request.session.get('carnet')
+    nombre = request.session.get('nombre')
+    
+    print(f"📚 Cargando dashboard de estudiante: {nombre} (carnet: {carnet})")
+    
+    return render(request, 'dashboardStudent.html', {
+        'nombre': nombre,
+        'carnet': carnet,
+        'rol': 'estudiante'
+    })
 
 
 def tutor_dashboard(request):
@@ -80,6 +92,7 @@ def tutor_dashboard(request):
         'cursos': cursos
     })
 
+
 @csrf_exempt
 def api_tutor_horarios(request):
     if request.session.get('rol') != 'tutor':
@@ -95,6 +108,7 @@ def api_tutor_horarios(request):
             return JsonResponse([], safe=False)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
 
 @csrf_exempt
 def api_tutor_limpiar_horarios(request):
@@ -117,6 +131,7 @@ def api_tutor_limpiar_horarios(request):
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
+
 @csrf_exempt
 def api_tutor_cargar_horarios(request):
     if request.session.get('rol') != 'tutor':
@@ -134,6 +149,7 @@ def api_tutor_cargar_horarios(request):
             return JsonResponse({'success': False, 'error': 'Error de conexión'}, status=500)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
 
 @csrf_exempt
 def api_tutor_notas(request):
@@ -168,11 +184,32 @@ def api_tutor_reportes(request):
     except:
         return JsonResponse({'actividades': [], 'promedios': {}, 'top_data': {}})
 
+
 @csrf_exempt
-def api_estudiante_cursos(request, carnet):
+def api_estudiante_notas(request):
+    """API para obtener notas del estudiante"""
+    if request.session.get('rol') != 'estudiante':
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+    
+    carnet = request.session.get('carnet')
+    
+    try:
+        response = requests.get(f"{BACKEND_URL}/notas/estudiante/{carnet}", timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json(), safe=False)
+        return JsonResponse([], safe=False)
+    except Exception as e:
+        print(f"Error al obtener notas: {e}")
+        return JsonResponse([], safe=False)
+
+
+@csrf_exempt
+def api_estudiante_cursos(request):
     """Obtener cursos del estudiante"""
     if request.session.get('rol') != 'estudiante':
         return JsonResponse({'error': 'No autorizado'}, status=403)
+    
+    carnet = request.session.get('carnet')
     
     try:
         response = requests.get(f"{BACKEND_URL}/estudiante/cursos/{carnet}", timeout=5)
@@ -184,10 +221,12 @@ def api_estudiante_cursos(request, carnet):
 
 
 @csrf_exempt
-def api_estudiante_tareas(request, carnet):
+def api_estudiante_tareas(request):
     """Obtener tareas del estudiante"""
     if request.session.get('rol') != 'estudiante':
         return JsonResponse({'error': 'No autorizado'}, status=403)
+    
+    carnet = request.session.get('carnet')
     
     try:
         response = requests.get(f"{BACKEND_URL}/estudiante/tareas/{carnet}", timeout=5)
@@ -196,21 +235,6 @@ def api_estudiante_tareas(request, carnet):
         return JsonResponse([], safe=False)
     except Exception as e:
         return JsonResponse([], safe=False)
-
-
-@csrf_exempt
-def api_estudiante_notas(request, carnet):
-    """Obtener notas del estudiante"""
-    if request.session.get('rol') != 'estudiante':
-        return JsonResponse({'error': 'No autorizado'}, status=403)
-    
-    try:
-        response = requests.get(f"{BACKEND_URL}/estudiante/notas/{carnet}", timeout=5)
-        if response.status_code == 200:
-            return JsonResponse(response.json())
-        return JsonResponse({'notas': [], 'cursos': {}})
-    except Exception as e:
-        return JsonResponse({'notas': [], 'cursos': {}})
 
 
 @csrf_exempt
@@ -243,21 +267,6 @@ def api_estudiante_horarios(request):
         return JsonResponse([], safe=False)
 
 
-# ============================================
-# VISTAS DEL ADMINISTRADOR
-# ============================================
-
-def admin_dashboard(request):
-    """Dashboard del administrador"""
-    if request.session.get('rol') != 'admin':
-        return redirect('login')
-
-    return render(request, 'dashboardAdmin.html', {
-        'nombre': request.session.get('nombre'),
-        'usuario': request.session.get('usuario')
-    })
-
-
 def admin_upload(request):
     """Página para subir XML"""
     if request.session.get('rol') != 'admin':
@@ -273,10 +282,6 @@ def admin_ver_usuarios(request):
 
     return render(request, 'admin/ver_usuarios.html')
 
-
-# ============================================
-# APIS DEL ADMINISTRADOR (Django → Flask)
-# ============================================
 
 @csrf_exempt
 def api_admin_cursos(request):
@@ -401,6 +406,3 @@ def api_admin_limpiar(request):
         return JsonResponse({'success': False, 'error': 'Error en el backend'}, status=500)
     except:
         return JsonResponse({'success': False, 'error': 'Error de conexión'}, status=500)
-#Arrancar el frontend
-#cd acadnet
-#python manage.py runserver

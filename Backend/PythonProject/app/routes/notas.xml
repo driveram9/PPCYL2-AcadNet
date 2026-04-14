@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notas>
+    <!-- ========================================== -->
+    <!-- Curso: Matemática Básica (Código: 770)    -->
+    <!-- Tutor: Juan Perez (registro: 201)         -->
+    <!-- ========================================== -->
+    <curso codigo="770">
+        <actividad nombre="Examen Parcial 1">
+            <nota carnet="101">85</nota>
+            <nota carnet="102">78</nota>
+            <nota carnet="111">92</nota>
+            <nota carnet="116">88</nota>
+        </actividad>
+        
+        <actividad nombre="Examen Parcial 2">
+            <nota carnet="101">90</nota>
+            <nota carnet="102">82</nota>
+            <nota carnet="111">88</nota>
+            <nota carnet="116">91</nota>
+        </actividad>
+        
+        <actividad nombre="Tarea 1">
+            <nota carnet="101">100</nota>
+            <nota carnet="102">95</nota>
+            <nota carnet="111">98</nota>
+            <nota carnet="116">92</nota>
+        </actividad>
+        
+        <actividad nombre="Proyecto Final">
+            <nota carnet="101">88</nota>
+            <nota carnet="102">85</nota>
+            <nota carnet="111">95</nota>
+            <nota carnet="116">90</nota>
+        </actividad>
+        
+        <actividad nombre="Examen Final">
+            <nota carnet="101">92</nota>
+            <nota carnet="102">88</nota>
+            <nota carnet="111">96</nota>
+            <nota carnet="116">89</nota>
+        </actividad>
+    </curso>
+
+    <!-- ========================================== -->
+    <!-- Curso: Física General (Código: 771)       -->
+    <!-- Tutor: Juan Perez (registro: 201)         -->
+    <!-- ========================================== -->
+    <curso codigo="771">
+        <actividad nombre="Laboratorio 1">
+            <nota carnet="103">75</nota>
+            <nota carnet="104">82</nota>
+            <nota carnet="112">88</nota>
+            <nota carnet="117">79</nota>
+        </actividad>
+        
+        <actividad nombre="Laboratorio 2">
+            <nota carnet="103">80</nota>
+            <nota carnet="104">85</nota>
+            <nota carnet="112">90</nota>
+            <nota carnet="117">83</nota>
+        </actividad>
+        
+        <actividad nombre="Examen Teórico">
+            <nota carnet="103">88</nota>
+            <nota carnet="104">78</nota>
+            <nota carnet="112">92</nota>
+            <nota carnet="117">85</nota>
+        </actividad>
+        
+        <actividad nombre="Proyecto Física">
+            <nota carnet="103">90</nota>
+            <nota carnet="104">88</nota>
+            <nota carnet="112">94</nota>
+            <nota carnet="117">86</nota>
+        </actividad>
+    </curso>
+
+    <!-- ========================================== -->
+    <!-- Curso: Química General (Código: 772)      -->
+    <!-- Tutor: Maria Lopez (registro: 202)        -->
+    <!-- ========================================== -->
+    <curso codigo="772">
+        <actividad nombre="Práctica de Laboratorio 1">
+            <nota carnet="105">92</nota>
+            <nota carnet="106">88</nota>
+            <nota carnet="113">85</nota>
+            <nota carnet="118">90</nota>
+        </actividad>
+        
+        <actividad nombre="Práctica de Laboratorio 2">
+            <nota carnet="105">89</nota>
+            <nota carnet="106">91</nota>
+            <nota carnet="113">87</nota>
+            <nota carnet="118">93</nota>
+        </actividad>
+        
+        <actividad nombre="Examen de Química">
+            <nota carnet="105">95</nota>
+            <nota carnet="106">90</nota>
+            <nota carnet="113">88</nota>
+            <nota carnet="118">92</nota>
+        </actividad>
+        
+        <actividad nombre="Informe Final">
+            <nota carnet="105">100</nota>
+            <nota carnet="106">95</nota>
+            <nota carnet="113">92</nota>
+            <nota carnet="118">96</nota>
+        </actividad>
+    </curso>
+
+    <!-- ========================================== -->
+    <!-- Curso: Programación I (Código: 773)       -->
+    <!-- Tutor: Carlos Hernandez (registro: 203)   -->
+    <!-- ========================================== -->
+    <curso codigo="773">
+        <actividad nombre="Tarea Programación 1">
+            <nota carnet="107">85</nota>
+            <nota carnet="108">90</nota>
+            <nota carnet="114">88</nota>
+            <nota carnet="119">82</nota>
+        </actividad>
+        
+        <actividad nombre="Tarea Programación 2">
+            <nota carnet="107">90</nota>
+            <nota carnet="108">92</nota>
+            <nota carnet="114">89</nota>
+            <nota carnet="119">85</nota>
+        </actividad>
+        
+        <actividad nombre="Proyecto Intermedio">
+            <nota carnet="107">78</nota>
+            <nota carnet="108">85</nota>
+            <nota carnet="114">82</nota>
+            <nota carnet="119">80</nota>
+        </actividad>
+        
+        <actividad nombre="Examen de Código">
+            <nota carnet="107">88</nota>
+            <nota carnet="108">94</nota>
+            <nota carnet="114">86</nota>
+            <nota carnet="119">90</nota>
+        </actividad>
+        
+        <actividad nombre="Proyecto Final">
+            <nota carnet="107">92</nota>
+            <nota carnet="108">96</nota>
+            <nota carnet="114">90</nota>
+            <nota carnet="119">88</nota>
+        </actividad>
+    </curso>
+
+    <!-- ========================================== -->
+    <!-- Curso: Álgebra Lineal (Código: 774)       -->
+    <!-- Tutor: Maria Lopez (registro: 202)        -->
+    <!-- ========================================== -->
+    <curso codigo="774">
+        <actividad nombre="Taller 1">
+            <nota carnet="109">95</nota>
+            <nota carnet="110">88</nota>
+            <nota carnet="115">92</nota>
+            <nota carnet="120">85</nota>
+        </actividad>
+        
+        <actividad nombre="Taller 2">
+            <nota carnet="109">90</nota>
+            <nota carnet="110">85</nota>
+            <nota carnet="115">89</nota>
+            <nota carnet="120">82</nota>
+        </actividad>
+        
+        <actividad nombre="Examen de Vectores">
+            <nota carnet="109">88</nota>
+            <nota carnet="110">92</nota>
+            <nota carnet="115">85</nota>
+            <nota carnet="120">90</nota>
+        </actividad>
+        
+        <actividad nombre="Examen de Matrices">
+            <nota carnet="109">92</nota>
+            <nota carnet="110">89</nota>
+            <nota carnet="115">88</nota>
+            <nota carnet="120">91</nota>
+        </actividad>
+        
+        <actividad nombre="Proyecto Final">
+            <nota carnet="109">96</nota>
+            <nota carnet="110">94</nota>
+            <nota carnet="115">90</nota>
+            <nota carnet="120">88</nota>
+        </actividad>
+    </curso>
+</notas>

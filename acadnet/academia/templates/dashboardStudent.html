@@ -104,7 +104,7 @@
             </div>
 
             <div id="horario" class="section" style="display:none;">
-                <h3>Horario de Tutorías</h3>
+                <h3>Horario</h3>
                 <div id="contenedorHorarios">
                     <p>Cargando horarios...</p>
                 </div>
@@ -113,7 +113,6 @@
     </section>
 
     <script>
-
         const carnet = "{{ carnet }}";
         const csrfToken = "{{ csrf_token }}";
 
@@ -130,7 +129,6 @@
                 document.querySelectorAll('[data-section]').forEach(li => li.classList.remove('active'));
                 this.classList.add('active');
 
-                // Cargar datos según la sección
                 if (sectionId === 'cursos') cargarCursos();
                 if (sectionId === 'tareas-pendientes') cargarTareas();
                 if (sectionId === 'notas') cargarNotas();
@@ -144,7 +142,7 @@
             lista.innerHTML = '<li>Cargando cursos...</li>';
 
             try {
-                const response = await fetch(`/api/estudiante/cursos/${carnet}`);
+                const response = await fetch('/api/estudiante/cursos');
                 const cursos = await response.json();
 
                 if (cursos.length === 0) {
@@ -163,7 +161,7 @@
             lista.innerHTML = '<li>Cargando tareas...</li>';
 
             try {
-                const response = await fetch(`/api/estudiante/tareas/${carnet}`);
+                const response = await fetch('/api/estudiante/tareas');
                 const tareas = await response.json();
 
                 if (tareas.length === 0) {
@@ -184,10 +182,8 @@
             promedioDiv.innerHTML = '';
 
             try {
-                const response = await fetch(`/api/estudiante/notas/${carnet}`);
-                const data = await response.json();
-                const notas = data.notas || [];
-                const cursosInfo = data.cursos || {};
+                const response = await fetch('/api/estudiante/notas');
+                const notas = await response.json();
 
                 if (notas.length === 0) {
                     contenedor.innerHTML = '<p>No hay notas registradas</p>';
@@ -207,11 +203,10 @@
                 let todasNotas = [];
 
                 for (const [curso, notasCurso] of Object.entries(notasPorCurso)) {
-                    const nombreCurso = cursosInfo[curso] || curso;
                     const promedioCurso = (notasCurso.reduce((sum, n) => sum + n.nota, 0) / notasCurso.length).toFixed(1);
 
                     html += `<div class="curso-notas" style="margin-bottom: 20px;">`;
-                    html += `<h4>${nombreCurso} (Promedio: ${promedioCurso})</h4>`;
+                    html += `<h4>Curso: ${curso} (Promedio: ${promedioCurso})</h4>`;
                     html += `<ul>`;
                     notasCurso.forEach(nota => {
                         html += `<li>${nota.actividad}: ${nota.nota}</li>`;
@@ -238,7 +233,7 @@
             lista.innerHTML = '<li>Cargando anuncios...</li>';
 
             try {
-                const response = await fetch(`/api/estudiante/anuncios`);
+                const response = await fetch('/api/estudiante/anuncios');
                 const anuncios = await response.json();
 
                 if (anuncios.length === 0) {
@@ -311,6 +306,8 @@
                 window.location.href = '/';
             }
         });
+
+        // Cargar cursos al iniciar
         cargarCursos();
     </script>
 

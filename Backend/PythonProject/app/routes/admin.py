@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, jsonify
 import os
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
-
+import traceback  # Añade al inicio del archivo
 admin_bp = Blueprint("admin", __name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -96,60 +96,23 @@ def api_upload_xml():
 
     return jsonify({"success": True, "mensaje": "Archivo cargado correctamente"})
 
-
 @admin_bp.route("/api/admin/procesar", methods=["GET"])
 def api_procesar_xml():
-    """Procesar XML y obtener estadísticas"""
+    """Procesar XML y devolver el XML de salida"""
     if not os.path.exists(xml_path):
         return jsonify({"success": False, "error": "No hay archivo cargado"}), 404
 
-    tree = ET.parse(xml_path)
-    root = tree.getroot()
-
-    cursos = root.findall("cursos/curso")
-    tutores = root.findall("tutores/tutor")
-    estudiantes = root.findall("estudiantes/estudiante")
-
-    cursos_codigos = {c.get("codigo") for c in cursos}
-    tutores_ids = {t.get("registro_personal") for t in tutores}
-    estudiantes_ids = {e.get("carnet") for e in estudiantes}
-
-    # Asignaciones
-    tutor_cursos = root.findall("asignaciones/c_tutores/tutor_curso")
-    estudiante_cursos = root.findall("asignaciones/c_estudiante/estudiante_curso")
-
-    total_tutor_cursos = len(tutor_cursos)
-    correctos_tutor_cursos = sum(
-        1 for tc in tutor_cursos
-        if tc.get("codigo") in cursos_codigos and tc.text in tutores_ids
-    )
-
-    total_estudiante_cursos = len(estudiante_cursos)
-    correctos_estudiante_cursos = sum(
-        1 for ec in estudiante_cursos
-        if ec.get("codigo") in cursos_codigos and ec.text in estudiantes_ids
-    )
-
-    return jsonify({
-        "success": True,
-        "cursos": {
-            "total": len(cursos),
-            "lista": [{"codigo": c.get("codigo"), "nombre": c.text} for c in cursos]
-        },
-        "tutores": {
-            "total": len(tutores),
-            "correctos": correctos_tutor_cursos,
-            "incorrectos": total_tutor_cursos - correctos_tutor_cursos,
-            "total_asignaciones": total_tutor_cursos
-        },
-        "estudiantes": {
-            "total": len(estudiantes),
-            "correctos": correctos_estudiante_cursos,
-            "incorrectos": total_estudiante_cursos - correctos_estudiante_cursos,
-            "total_asignaciones": total_estudiante_cursos
-        }
-    })
-
+    try:
+        tree = ET.parse(xml_path)
+        root = tree.getroot()
+        salida_xml = generar_xml_salida(root)
+        return jsonify({"success": True, "salida_xml": salida_xml})
+    except ET.ParseError as e:
+        return jsonify({"success": False, "error": f"Error de sintaxis en XML: {str(e)}"}), 400
+    except Exception as e:
+        print("❌ Error al procesar XML:")
+        traceback.print_exc()
+        return jsonify({"success": False, "error": f"Error interno: {str(e)}"}), 500
 
 @admin_bp.route("/api/admin/xml", methods=["GET"])
 def api_get_xml():
@@ -185,3 +148,71 @@ def api_limpiar_xml():
         os.remove(xml_path)
         return jsonify({"success": True, "mensaje": "Archivo eliminado"})
     return jsonify({"success": False, "error": "No hay archivo para eliminar"}), 404
+
+
+# ============================================
+# NUEVA FUNCIÓN: GENERAR XML DE SALIDA
+# ============================================
+
+
+def generar_xml_salida(root_entrada):
+    """Genera el XML de salida según el formato especificado (más tolerante)"""
+    # Buscar las secciones (con nombres exactos)
+    cursos = root_entrada.findall("cursos/curso")
+    tutores = root_entrada.findall("tutores/tutor")
+    estudiantes = root_entrada.findall("estudiantes/estudiante")
+
+    # Si no encuentra, probar con mayúsculas (por si acaso)
+    if not cursos:
+        cursos = root_entrada.findall("Cursos/Curso")
+    if not tutores:
+        tutores = root_entrada.findall("Tutores/Tutor")
+    if not estudiantes:
+        estudiantes = root_entrada.findall("Estudiantes/Estudiante")
+
+    cursos_codigos = {c.get("codigo") for c in cursos if c.get("codigo")}
+    tutores_ids = {t.get("registro_personal") for t in tutores if t.get("registro_personal")}
+    estudiantes_ids = {e.get("carnet") for e in estudiantes if e.get("carnet")}
+
+    # Asignaciones
+    tutor_cursos = root_entrada.findall("asignaciones/c_tutores/tutor_curso")
+    estudiante_cursos = root_entrada.findall("asignaciones/c_estudiante/estudiante_curso")
+
+    total_tutor_cursos = len(tutor_cursos)
+    correctos_tutor_cursos = 0
+    for tc in tutor_cursos:
+        codigo = tc.get("codigo")
+        tutor_id = tc.text
+        if codigo in cursos_codigos and tutor_id in tutores_ids:
+            correctos_tutor_cursos += 1
+
+    total_estudiante_cursos = len(estudiante_cursos)
+    correctos_estudiante_cursos = 0
+    for ec in estudiante_cursos:
+        codigo = ec.get("codigo")
+        estudiante_id = ec.text
+        if codigo in cursos_codigos and estudiante_id in estudiantes_ids:
+            correctos_estudiante_cursos += 1
+
+    # Construir XML de salida
+    salida_root = ET.Element("configuraciones_aplicadas")
+    ET.SubElement(salida_root, "tutores_cargados").text = str(len(tutores))
+    ET.SubElement(salida_root, "estudiantes_cargados").text = str(len(estudiantes))
+
+    asignaciones = ET.SubElement(salida_root, "asignaciones")
+
+    tutores_elem = ET.SubElement(asignaciones, "tutores")
+    ET.SubElement(tutores_elem, "total").text = str(total_tutor_cursos)
+    ET.SubElement(tutores_elem, "correcto").text = str(correctos_tutor_cursos)
+    ET.SubElement(tutores_elem, "incorrecto").text = str(total_tutor_cursos - correctos_tutor_cursos)
+
+    estudiantes_elem = ET.SubElement(asignaciones, "estudiantes")
+    ET.SubElement(estudiantes_elem, "total").text = str(total_estudiante_cursos)
+    ET.SubElement(estudiantes_elem, "correcto").text = str(correctos_estudiante_cursos)
+    ET.SubElement(estudiantes_elem, "incorrecto").text = str(total_estudiante_cursos - correctos_estudiante_cursos)
+
+    # Pretty-print
+    rough_string = ET.tostring(salida_root, 'utf-8')
+    reparsed = minidom.parseString(rough_string)
+    return reparsed.toprettyxml(indent="    ")
+

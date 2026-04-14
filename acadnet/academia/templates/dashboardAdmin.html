@@ -1,533 +1,282 @@
-{% load static %}
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Dashboard Administrador</title>
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <title>Panel Administrador</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
-
-        #sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 260px;
-            height: 100%;
-            background: #1a1a2e;
-            color: white;
-            padding: 20px 0;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 20px 20px;
-            font-size: 20px;
-            font-weight: bold;
-            text-decoration: none;
-            color: white;
-            border-bottom: 1px solid #333;
-            margin-bottom: 20px;
-        }
-
-        .side-menu {
-            list-style: none;
-        }
-
-        .side-menu li {
-            padding: 12px 20px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .side-menu li:hover, .side-menu li.active {
-            background: #0f3460;
-        }
-
-        .side-menu li a {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        #content {
-            margin-left: 260px;
-            padding: 20px;
-        }
-
-        .section {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        h3 { margin-bottom: 20px; color: #333; }
-        h4 { margin: 15px 0 10px; color: #555; }
-
+        body { font-family: Arial, sans-serif; margin: 0; display: flex; }
+        #sidebar { width: 250px; background: #2c3e50; color: white; height: 100vh; padding: 20px; }
+        #sidebar ul { list-style: none; padding: 0; }
+        #sidebar li { padding: 10px; cursor: pointer; }
+        #sidebar li.active, #sidebar li:hover { background: #1abc9c; }
+        #content { flex: 1; padding: 20px; }
+        .section { display: none; }
+        .section.active-section { display: block; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #f8f9fa; }
-
-        button {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px 10px 0 0;
-        }
-
-        button:hover { opacity: 0.9; }
-        .btn-danger { background: #dc3545; }
-        .btn-warning { background: #ffc107; color: #333; }
-        .btn-info { background: #17a2b8; }
-
-        input[type="file"] {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 400px;
-            margin: 10px 0;
-        }
-
-        textarea {
-            width: 100%;
-            height: 400px;
-            font-family: monospace;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .stat-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-card .number {
-            font-size: 32px;
-            font-weight: bold;
-            color: #28a745;
-        }
-
-        .loading { text-align: center; padding: 20px; color: #666; }
-        .error { color: red; padding: 10px; background: #fee; border-radius: 5px; margin: 10px 0; }
-        .success { color: green; padding: 10px; background: #efe; border-radius: 5px; margin: 10px 0; }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-        }
-        .modal-content {
-            background: white;
-            margin: 10% auto;
-            padding: 20px;
-            width: 80%;
-            max-width: 800px;
-            border-radius: 10px;
-        }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f2f2f2; }
+        button { background: #3498db; color: white; border: none; padding: 8px 15px; cursor: pointer; margin: 5px; }
+        button:hover { opacity: 0.8; }
+        .error { color: red; background: #ffe6e6; padding: 10px; margin: 10px 0; }
+        .success { color: green; background: #e6ffe6; padding: 10px; margin: 10px 0; }
+        textarea { width: 100%; height: 300px; font-family: monospace; margin-top: 10px; }
     </style>
 </head>
-
 <body>
-    <section id="sidebar">
-        <a href="#" class="brand">
-            <i class='bx bx-badge-check'></i>
-            <span class="text">Administrador</span>
-        </a>
-        <ul class="side-menu top">
-            <li class="active" data-section="gestion-cursos">
-                <a href="#"><i class="bx bxs-dashboard"></i><span class="text">Gestión de Cursos</span></a>
-            </li>
-            <li data-section="tutores">
-                <a href="#"><i class="bx bx-book-content"></i><span class="text">Tutores</span></a>
-            </li>
-            <li data-section="estudiantes">
-                <a href="#"><i class="bx bx-pencil"></i><span class="text">Estudiantes</span></a>
-            </li>
-            <li data-section="upload">
-                <a href="#"><i class="bx bx-upload"></i><span class="text">Cargar XML</span></a>
-            </li>
-            <li data-section="editar-xml">
-                <a href="#"><i class="bx bx-edit"></i><span class="text">Editar XML</span></a>
-            </li>
+    <div id="sidebar">
+        <h3>Administrador</h3>
+        <ul>
+            <li data-section="cursos" class="active">📚 Cursos</li>
+            <li data-section="tutores">👨‍🏫 Tutores</li>
+            <li data-section="estudiantes">🎓 Estudiantes</li>
+            <li data-section="upload">📤 Cargar XML</li>
+            <li data-section="editar">✏️ Editar XML</li>
+            <li><a href="/logout" style="color:white; text-decoration:none;">🚪 Cerrar sesión</a></li>
         </ul>
-        <ul class="side-menu">
-            <li>
-                <a href="/logout" class="logout">
-                    <i class="bx bx-right-arrow-alt"></i>
-                    <span class="text">Cerrar sesión</span>
-                </a>
-            </li>
-        </ul>
-    </section>
+    </div>
+    <div id="content">
+        <!-- Sección Cursos -->
+        <div id="cursos" class="section active-section">
+            <h2>Gestión de Cursos</h2>
+            <button id="btnCargarCursos">🔄 Cargar Cursos</button>
+            <div id="cursosLista">Cargando...</div>
+        </div>
 
-    <section id="content">
-        <main>
-            <!-- Sección: Gestión de Cursos -->
-            <div id="gestion-cursos" class="section">
-                <h3>📚 Gestión de Cursos</h3>
-                <button id="btnCargarCursos" class="btn-info">🔄 Cargar Cursos</button>
-                <div id="cursosLista" class="loading">Cargando cursos...</div>
-            </div>
+        <!-- Sección Tutores -->
+        <div id="tutores" class="section">
+            <h2>Tutores</h2>
+            <button id="btnCargarTutores">🔄 Cargar Tutores</button>
+            <div id="tutoresLista">Cargando...</div>
+        </div>
 
-            <!-- Sección: Tutores -->
-            <div id="tutores" class="section" style="display:none;">
-                <h3>👨‍🏫 Tutores Registrados</h3>
-                <button id="btnCargarTutores" class="btn-info">🔄 Cargar Tutores</button>
-                <div id="tutoresLista" class="loading">Cargando tutores...</div>
-            </div>
+        <!-- Sección Estudiantes -->
+        <div id="estudiantes" class="section">
+            <h2>Estudiantes</h2>
+            <button id="btnCargarEstudiantes">🔄 Cargar Estudiantes</button>
+            <div id="estudiantesLista">Cargando...</div>
+        </div>
 
-            <!-- Sección: Estudiantes -->
-            <div id="estudiantes" class="section" style="display:none;">
-                <h3>🎓 Estudiantes Registrados</h3>
-                <button id="btnCargarEstudiantes" class="btn-info">🔄 Cargar Estudiantes</button>
-                <div id="estudiantesLista" class="loading">Cargando estudiantes...</div>
+        <!-- Sección Cargar XML -->
+        <div id="upload" class="section">
+            <h2>Cargar Archivo XML</h2>
+            <input type="file" id="fileXml" accept=".xml">
+            <button id="btnSubirXml">Subir Archivo</button>
+            <button id="btnProcesarXml">⚙️ Procesar (generar salida)</button>
+            <button id="btnLimpiarXml">🗑️ Limpiar Datos</button>
+            <div id="mensajeXml"></div>
+            <div id="salidaXmlContainer" style="display:none;">
+                <h3>XML de Salida</h3>
+                <textarea id="salidaXml" rows="10" readonly></textarea>
+                <button id="btnCopiarXml">📋 Copiar</button>
+                <button id="btnDescargarXml">💾 Descargar</button>
             </div>
+        </div>
 
-            <!-- Sección: Cargar XML -->
-            <div id="upload" class="section" style="display:none;">
-                <h3>📤 Cargar Archivo XML</h3>
-                <p>Selecciona un archivo XML con la estructura de cursos, tutores y estudiantes.</p>
-                <input type="file" id="fileXml" accept=".xml">
-                <button id="btnSubirXml">Subir Archivo</button>
-                <button id="btnProcesarXml" class="btn-info">📊 Procesar Estadísticas</button>
-                <button id="btnLimpiarXml" class="btn-danger">🗑️ Limpiar Datos</button>
-                <div id="mensajeXml"></div>
-                <div id="estadisticasXml" style="display:none;">
-                    <h4>📈 Estadísticas del Archivo</h4>
-                    <div id="statsContent"></div>
-                </div>
-            </div>
-
-            <!-- Sección: Editar XML -->
-            <div id="editar-xml" class="section" style="display:none;">
-                <h3>✏️ Editar XML</h3>
-                <button id="btnCargarXmlEditar" class="btn-info">📂 Cargar XML</button>
-                <button id="btnGuardarXml" class="btn-success" style="display:none;">💾 Guardar Cambios</button>
-                <textarea id="xmlEditor" placeholder="El XML se cargará aquí..." style="display:none;"></textarea>
-                <div id="mensajeEditor"></div>
-            </div>
-        </main>
-    </section>
+        <!-- Sección Editar XML -->
+        <div id="editar" class="section">
+            <h2>Editar XML Cargado</h2>
+            <button id="btnCargarXmlEditar">📂 Cargar XML actual</button>
+            <textarea id="xmlEditor" rows="15" style="display:none;"></textarea>
+            <button id="btnGuardarXml" style="display:none;">💾 Guardar Cambios</button>
+            <div id="mensajeEditor"></div>
+        </div>
+    </div>
 
     <script>
-        // ============================================
-        // MENÚ - CAMBIO DE SECCIONES
-        // ============================================
-        document.querySelectorAll('[data-section]').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const sectionId = this.getAttribute('data-section');
-                document.querySelectorAll('.section').forEach(section => {
-                    section.style.display = 'none';
+        document.addEventListener('DOMContentLoaded', function() {
+            // ---------- Menú ----------
+            const sections = document.querySelectorAll('.section');
+            const menuItems = document.querySelectorAll('#sidebar li[data-section]');
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const sectionId = item.getAttribute('data-section');
+                    sections.forEach(sec => sec.classList.remove('active-section'));
+                    document.getElementById(sectionId).classList.add('active-section');
+                    menuItems.forEach(li => li.classList.remove('active'));
+                    item.classList.add('active');
                 });
-                document.getElementById(sectionId).style.display = 'block';
-
-                document.querySelectorAll('[data-section]').forEach(li => li.classList.remove('active'));
-                this.classList.add('active');
             });
-        });
 
-        // ============================================
-        // FUNCIONES COMUNES
-        // ============================================
-        function mostrarMensaje(elementId, mensaje, esError = false) {
-            const div = document.getElementById(elementId);
-            div.innerHTML = `<div class="${esError ? 'error' : 'success'}">${mensaje}</div>`;
-            setTimeout(() => { if (div) div.innerHTML = ''; }, 5000);
-        }
-
-        // ============================================
-        // CARGAR CURSOS
-        // ============================================
-        async function cargarCursos() {
-            const container = document.getElementById('cursosLista');
-            container.innerHTML = '<div class="loading">Cargando cursos...</div>';
-
-            try {
-                const response = await fetch('/api/admin/cursos');
-                const cursos = await response.json();
-
-                if (cursos.length === 0) {
-                    container.innerHTML = '<div class="error">No hay cursos registrados. Carga un archivo XML primero.</div>';
-                } else {
-                    let html = '<table><thead><tr><th>Código</th><th>Nombre del Curso</th></tr></thead><tbody>';
-                    cursos.forEach(c => {
-                        html += `<tr><td><strong>${c.codigo}</strong></td><td>${c.nombre}</td></tr>`;
-                    });
-                    html += '</tbody></table>';
-                    container.innerHTML = html;
+            // Utilidad mensajes
+            function mostrarMensaje(divId, msg, isError = false) {
+                const div = document.getElementById(divId);
+                if (div) {
+                    div.innerHTML = `<div class="${isError ? 'error' : 'success'}">${msg}</div>`;
+                    setTimeout(() => div.innerHTML = '', 5000);
                 }
-            } catch (error) {
-                container.innerHTML = '<div class="error">Error al cargar cursos</div>';
-            }
-        }
-
-        document.getElementById('btnCargarCursos')?.addEventListener('click', cargarCursos);
-        cargarCursos(); // Carga inicial
-
-        // ============================================
-        // CARGAR TUTORES
-        // ============================================
-        async function cargarTutores() {
-            const container = document.getElementById('tutoresLista');
-            container.innerHTML = '<div class="loading">Cargando tutores...</div>';
-
-            try {
-                const response = await fetch('/api/admin/tutores');
-                const tutores = await response.json();
-
-                if (tutores.length === 0) {
-                    container.innerHTML = '<div class="error">No hay tutores registrados.</div>';
-                } else {
-                    let html = '<table><thead><tr><th>Registro</th><th>Nombre</th><th>Contraseña</th><th>Cursos Asignados</th></tr></thead><tbody>';
-                    tutores.forEach(t => {
-                        html += `<tr>
-                            <td><strong>${t.registro}</strong></td>
-                            <td>${t.nombre}</td>
-                            <td>${t.contrasenia}</td>
-                            <td>${t.cursos.join(', ') || 'Ninguno'}</td>
-                        </tr>`;
-                    });
-                    html += '</tbody></table>';
-                    container.innerHTML = html;
-                }
-            } catch (error) {
-                container.innerHTML = '<div class="error">Error al cargar tutores</div>';
-            }
-        }
-
-        document.getElementById('btnCargarTutores')?.addEventListener('click', cargarTutores);
-
-        // ============================================
-        // CARGAR ESTUDIANTES
-        // ============================================
-        async function cargarEstudiantes() {
-            const container = document.getElementById('estudiantesLista');
-            container.innerHTML = '<div class="loading">Cargando estudiantes...</div>';
-
-            try {
-                const response = await fetch('/api/admin/estudiantes');
-                const estudiantes = await response.json();
-
-                if (estudiantes.length === 0) {
-                    container.innerHTML = '<div class="error">No hay estudiantes registrados.</div>';
-                } else {
-                    let html = '<table><thead><tr><th>Carnet</th><th>Nombre</th><th>Contraseña</th><th>Cursos Asignados</th></tr></thead><tbody>';
-                    estudiantes.forEach(e => {
-                        html += `<tr>
-                            <td><strong>${e.carnet}</strong></td>
-                            <td>${e.nombre}</td>
-                            <td>${e.contrasenia}</td>
-                            <td>${e.cursos.join(', ') || 'Ninguno'}</td>
-                        </tr>`;
-                    });
-                    html += '</tbody></table>';
-                    container.innerHTML = html;
-                }
-            } catch (error) {
-                container.innerHTML = '<div class="error">Error al cargar estudiantes</div>';
-            }
-        }
-
-        document.getElementById('btnCargarEstudiantes')?.addEventListener('click', cargarEstudiantes);
-
-        // ============================================
-        // SUBIR XML
-        // ============================================
-        document.getElementById('btnSubirXml')?.addEventListener('click', async () => {
-            const fileInput = document.getElementById('fileXml');
-            const file = fileInput.files[0];
-
-            if (!file) {
-                mostrarMensaje('mensajeXml', '❌ Selecciona un archivo XML', true);
-                return;
             }
 
-            const formData = new FormData();
-            formData.append('archivo', file);
-
-            mostrarMensaje('mensajeXml', '⏳ Subiendo archivo...');
-
-            try {
-                const response = await fetch('/api/admin/upload', { method: 'POST', body: formData });
-                const data = await response.json();
-
-                if (data.success) {
-                    mostrarMensaje('mensajeXml', `✅ ${data.mensaje}`);
-                    fileInput.value = '';
-                } else {
-                    mostrarMensaje('mensajeXml', `❌ ${data.error}`, true);
-                }
-            } catch (error) {
-                mostrarMensaje('mensajeXml', '❌ Error de conexión', true);
-            }
-        });
-
-        // ============================================
-        // PROCESAR XML
-        // ============================================
-        document.getElementById('btnProcesarXml')?.addEventListener('click', async () => {
-            const statsDiv = document.getElementById('estadisticasXml');
-            statsDiv.style.display = 'block';
-            document.getElementById('statsContent').innerHTML = '<div class="loading">Procesando...</div>';
-
-            try {
-                const response = await fetch('/api/admin/procesar');
-                const data = await response.json();
-
-                if (data.success) {
-                    let html = `
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="number">${data.cursos.total}</div>
-                                <div>Cursos</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="number">${data.tutores.total}</div>
-                                <div>Tutores</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="number">${data.estudiantes.total}</div>
-                                <div>Estudiantes</div>
-                            </div>
-                        </div>
-                        <h4>📋 Asignaciones de Tutores</h4>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="number">${data.tutores.total_asignaciones}</div>
-                                <div>Total Asignaciones</div>
-                            </div>
-                            <div class="stat-card" style="background:#d4edda;">
-                                <div class="number" style="color:#155724;">${data.tutores.correctos}</div>
-                                <div>Correctas</div>
-                            </div>
-                            <div class="stat-card" style="background:#f8d7da;">
-                                <div class="number" style="color:#721c24;">${data.tutores.incorrectos}</div>
-                                <div>Incorrectas</div>
-                            </div>
-                        </div>
-                        <h4>📋 Asignaciones de Estudiantes</h4>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="number">${data.estudiantes.total_asignaciones}</div>
-                                <div>Total Asignaciones</div>
-                            </div>
-                            <div class="stat-card" style="background:#d4edda;">
-                                <div class="number" style="color:#155724;">${data.estudiantes.correctos}</div>
-                                <div>Correctas</div>
-                            </div>
-                            <div class="stat-card" style="background:#f8d7da;">
-                                <div class="number" style="color:#721c24;">${data.estudiantes.incorrectos}</div>
-                                <div>Incorrectas</div>
-                            </div>
-                        </div>
-                    `;
-                    document.getElementById('statsContent').innerHTML = html;
-                    mostrarMensaje('mensajeXml', '✅ Estadísticas procesadas');
-                } else {
-                    document.getElementById('statsContent').innerHTML = `<div class="error">${data.error}</div>`;
-                }
-            } catch (error) {
-                document.getElementById('statsContent').innerHTML = '<div class="error">Error al procesar</div>';
-            }
-        });
-
-        // ============================================
-        // LIMPIAR XML
-        // ============================================
-        document.getElementById('btnLimpiarXml')?.addEventListener('click', async () => {
-            if (confirm('⚠️ ¿Estás seguro de que deseas eliminar el archivo XML? Esta acción no se puede deshacer.')) {
+            // ========== CURSOS ==========
+            async function cargarCursos() {
+                const container = document.getElementById('cursosLista');
+                container.innerHTML = 'Cargando...';
                 try {
-                    const response = await fetch('/api/admin/limpiar', { method: 'DELETE' });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        mostrarMensaje('mensajeXml', `✅ ${data.mensaje}`);
-                        document.getElementById('estadisticasXml').style.display = 'none';
-                    } else {
-                        mostrarMensaje('mensajeXml', `❌ ${data.error}`, true);
+                    const res = await fetch('/api/admin/cursos');
+                    if (!res.ok) throw new Error('Error en la petición');
+                    const cursos = await res.json();
+                    if (!cursos.length) {
+                        container.innerHTML = '<div class="error">No hay cursos. Sube un XML primero.</div>';
+                        return;
                     }
-                } catch (error) {
-                    mostrarMensaje('mensajeXml', '❌ Error de conexión', true);
+                    let html = '<table><thead><tr><th>Código</th><th>Nombre</th></tr></thead><tbody>';
+                    cursos.forEach(c => html += `<tr><td>${c.codigo}</td><td>${c.nombre}</td></tr>`);
+                    html += '</tbody> nahil';
+                    container.innerHTML = html;
+                } catch (err) {
+                    container.innerHTML = '<div class="error">Error al cargar cursos. ¿Backend activo?</div>';
                 }
             }
-        });
+            document.getElementById('btnCargarCursos').addEventListener('click', cargarCursos);
+            cargarCursos();
 
-        // ============================================
-        // EDITAR XML
-        // ============================================
-        document.getElementById('btnCargarXmlEditar')?.addEventListener('click', async () => {
+            // ========== TUTORES ==========
+            async function cargarTutores() {
+                const container = document.getElementById('tutoresLista');
+                container.innerHTML = 'Cargando...';
+                try {
+                    const res = await fetch('/api/admin/tutores');
+                    const tutores = await res.json();
+                    if (!tutores.length) {
+                        container.innerHTML = '<div class="error">No hay tutores.</div>';
+                        return;
+                    }
+                    let html = '<table><thead><tr><th>Registro</th><th>Nombre</th><th>Contraseña</th><th>Cursos</th></tr></thead><tbody>';
+                    tutores.forEach(t => {
+                        html += `<tr><td>${t.registro}</td><td>${t.nombre}</td><td>${t.contrasenia}</td><td>${t.cursos.join(', ') || 'Ninguno'}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                } catch (err) {
+                    container.innerHTML = '<div class="error">Error al cargar tutores.</div>';
+                }
+            }
+            document.getElementById('btnCargarTutores').addEventListener('click', cargarTutores);
+
+            // ========== ESTUDIANTES ==========
+            async function cargarEstudiantes() {
+                const container = document.getElementById('estudiantesLista');
+                container.innerHTML = 'Cargando...';
+                try {
+                    const res = await fetch('/api/admin/estudiantes');
+                    const estudiantes = await res.json();
+                    if (!estudiantes.length) {
+                        container.innerHTML = '<div class="error">No hay estudiantes.</div>';
+                        return;
+                    }
+                    let html = '<table><thead><tr><th>Carnet</th><th>Nombre</th><th>Contraseña</th><th>Cursos</th></tr></thead><tbody>';
+                    estudiantes.forEach(e => {
+                        html += `<tr><td>${e.carnet}</td><td>${e.nombre}</td><td>${e.contrasenia}</td><td>${e.cursos.join(', ') || 'Ninguno'}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                } catch (err) {
+                    container.innerHTML = '<div class="error">Error al cargar estudiantes.</div>';
+                }
+            }
+            document.getElementById('btnCargarEstudiantes').addEventListener('click', cargarEstudiantes);
+
+            // ========== SUBIR XML ==========
+            document.getElementById('btnSubirXml').addEventListener('click', async () => {
+                const file = document.getElementById('fileXml').files[0];
+                if (!file) return mostrarMensaje('mensajeXml', 'Selecciona un archivo XML', true);
+                const fd = new FormData();
+                fd.append('archivo', file);
+                mostrarMensaje('mensajeXml', 'Subiendo...');
+                try {
+                    const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+                    const data = await res.json();
+                    if (data.success) {
+                        mostrarMensaje('mensajeXml', '✅ Archivo cargado');
+                        cargarCursos(); cargarTutores(); cargarEstudiantes();
+                    } else mostrarMensaje('mensajeXml', data.error, true);
+                } catch (err) { mostrarMensaje('mensajeXml', 'Error de conexión', true); }
+            });
+
+            // ========== PROCESAR (XML de salida) ==========
+            const salidaContainer = document.getElementById('salidaXmlContainer');
+            const salidaTextarea = document.getElementById('salidaXml');
+            document.getElementById('btnProcesarXml').addEventListener('click', async () => {
+                salidaContainer.style.display = 'none';
+                mostrarMensaje('mensajeXml', 'Procesando...');
+                try {
+                    const res = await fetch('/api/admin/procesar');
+                    const data = await res.json();
+                    if (data.success && data.salida_xml) {
+                        salidaTextarea.value = data.salida_xml;
+                        salidaContainer.style.display = 'block';
+                        mostrarMensaje('mensajeXml', '✅ XML de salida generado');
+                    } else mostrarMensaje('mensajeXml', data.error || 'Error al procesar', true);
+                } catch (err) { mostrarMensaje('mensajeXml', 'Error de conexión', true); }
+            });
+
+            // Copiar y descargar
+            document.getElementById('btnCopiarXml').addEventListener('click', () => {
+                salidaTextarea.select(); document.execCommand('copy');
+                mostrarMensaje('mensajeXml', 'Copiado al portapapeles');
+            });
+            document.getElementById('btnDescargarXml').addEventListener('click', () => {
+                const blob = new Blob([salidaTextarea.value], { type: 'application/xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'salida_configuraciones.xml'; a.click();
+                URL.revokeObjectURL(url);
+            });
+
+            // ========== LIMPIAR XML ==========
+            document.getElementById('btnLimpiarXml').addEventListener('click', async () => {
+                if (!confirm('¿Eliminar todos los datos?')) return;
+                try {
+                    const res = await fetch('/api/admin/limpiar', { method: 'DELETE' });
+                    const data = await res.json();
+                    if (data.success) {
+                        mostrarMensaje('mensajeXml', 'Datos eliminados');
+                        document.getElementById('cursosLista').innerHTML = '<div class="error">No hay datos</div>';
+                        document.getElementById('tutoresLista').innerHTML = '<div class="error">No hay datos</div>';
+                        document.getElementById('estudiantesLista').innerHTML = '<div class="error">No hay datos</div>';
+                        salidaContainer.style.display = 'none';
+                    } else mostrarMensaje('mensajeXml', data.error, true);
+                } catch (err) { mostrarMensaje('mensajeXml', 'Error de conexión', true); }
+            });
+
+            // ========== EDITAR XML ==========
             const editor = document.getElementById('xmlEditor');
-            const guardarBtn = document.getElementById('btnGuardarXml');
-
-            editor.style.display = 'block';
-            editor.value = 'Cargando...';
-            guardarBtn.style.display = 'none';
-
-            try {
-                const response = await fetch('/api/admin/xml');
-                const data = await response.json();
-
-                if (data.success) {
-                    editor.value = data.contenido;
-                    guardarBtn.style.display = 'inline-block';
-                    mostrarMensaje('mensajeEditor', '✅ XML cargado para edición');
-                } else {
-                    editor.value = 'No hay archivo XML cargado. Sube uno primero.';
-                    mostrarMensaje('mensajeEditor', `❌ ${data.error}`, true);
+            const btnGuardar = document.getElementById('btnGuardarXml');
+            document.getElementById('btnCargarXmlEditar').addEventListener('click', async () => {
+                editor.style.display = 'block';
+                editor.value = 'Cargando...';
+                btnGuardar.style.display = 'none';
+                try {
+                    const res = await fetch('/api/admin/xml');
+                    const data = await res.json();
+                    if (data.success && data.contenido) {
+                        editor.value = data.contenido;
+                        btnGuardar.style.display = 'inline-block';
+                        mostrarMensaje('mensajeEditor', 'XML cargado para edición');
+                    } else {
+                        editor.value = 'No hay archivo XML cargado.';
+                        mostrarMensaje('mensajeEditor', data.error, true);
+                    }
+                } catch (err) {
+                    editor.value = 'Error de conexión';
+                    mostrarMensaje('mensajeEditor', 'Error de conexión', true);
                 }
-            } catch (error) {
-                editor.value = 'Error al cargar el XML';
-                mostrarMensaje('mensajeEditor', '❌ Error de conexión', true);
-            }
-        });
-
-        document.getElementById('btnGuardarXml')?.addEventListener('click', async () => {
-            const contenido = document.getElementById('xmlEditor').value;
-
-            try {
-                const response = await fetch('/api/admin/xml', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contenido: contenido })
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    mostrarMensaje('mensajeEditor', `✅ ${data.mensaje}`);
-                } else {
-                    mostrarMensaje('mensajeEditor', `❌ ${data.error}`, true);
-                }
-            } catch (error) {
-                mostrarMensaje('mensajeEditor', '❌ Error de conexión', true);
-            }
+            });
+            btnGuardar.addEventListener('click', async () => {
+                const contenido = editor.value;
+                if (!contenido) return;
+                try {
+                    const res = await fetch('/api/admin/xml', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contenido })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        mostrarMensaje('mensajeEditor', '✅ Guardado correctamente');
+                        cargarCursos(); cargarTutores(); cargarEstudiantes();
+                    } else mostrarMensaje('mensajeEditor', data.error, true);
+                } catch (err) { mostrarMensaje('mensajeEditor', 'Error de conexión', true); }
+            });
         });
     </script>
 </body>

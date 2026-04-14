@@ -47,6 +47,16 @@ class MatrizDispersa:
                 resultado[actividad] = estudiantes[carnet]
         return resultado
 
+    # ============================================
+    # NUEVO MÉTODO: obtener_por_estudiante
+    # ============================================
+    def obtener_por_estudiante(self, carnet):
+        """
+        Obtiene todas las notas de un estudiante.
+        Retorna un diccionario {actividad: nota}
+        """
+        return self.obtener_columna(carnet)
+
     def promedio_por_actividad(self, actividad):
         """Calcula el promedio de notas para una actividad"""
         fila = self.obtener_fila(actividad)

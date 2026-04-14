@@ -6,7 +6,7 @@ urlpatterns = [
     path('', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
 
-    # Dashboards (cambiar nombre para evitar conflicto)
+    # Dashboards
     path('panel-admin/', views.admin_dashboard, name='admin_dashboard'),
     path('tutor/', views.tutor_dashboard, name='tutor_dashboard'),
     path('estudiante/', views.estudiante_dashboard, name='estudiante_dashboard'),
@@ -29,4 +29,8 @@ urlpatterns = [
 
     # APIs del estudiante
     path('api/estudiante/notas', views.api_estudiante_notas, name='api_estudiante_notas'),
+    path('api/estudiante/cursos', views.api_estudiante_cursos, name='api_estudiante_cursos'),
+    path('api/estudiante/tareas', views.api_estudiante_tareas, name='api_estudiante_tareas'),
+    path('api/estudiante/anuncios', views.api_estudiante_anuncios, name='api_estudiante_anuncios'),
+    path('api/estudiante/horarios', views.api_estudiante_horarios, name='api_estudiante_horarios'),
 ]

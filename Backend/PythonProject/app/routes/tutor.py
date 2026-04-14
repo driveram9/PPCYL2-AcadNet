@@ -126,10 +126,6 @@ def guardar_matriz_tutor(registro_personal):
             json.dump(matriz.to_dict(), f, indent=2, ensure_ascii=False)
 
 
-# ============================================
-# NUEVAS FUNCIONES PARA ESTUDIANTES
-# ============================================
-
 def obtener_info_tutor(registro_personal):
     """Obtener información de un tutor por su registro"""
     if not os.path.exists(XML_PATH):
@@ -229,11 +225,9 @@ def api_cargar_horarios(registro):
     horarios_procesados = []
 
     try:
-        # Leer archivo raw
         raw_content = archivo.read()
         print(f"📦 Tamaño del archivo: {len(raw_content)} bytes")
 
-        # Intentar diferentes codificaciones
         texto = None
         for encoding in ['utf-8-sig', 'utf-8', 'latin-1', 'cp1252']:
             try:
@@ -248,14 +242,12 @@ def api_cargar_horarios(registro):
             print("❌ No se pudo decodificar el archivo")
             return jsonify({"success": False, "error": "No se pudo decodificar el archivo. Usa UTF-8"}), 400
 
-        # Remover BOM si existe
         if texto.startswith('\ufeff'):
             texto = texto[1:]
             print("✅ BOM removido")
 
         print(f"📝 Contenido del archivo (primeros 200 chars): {texto[:200]}")
 
-        # Parsear XML
         tree = ET.parse(StringIO(texto))
         root = tree.getroot()
         print(f"✅ XML parseado correctamente")
@@ -340,11 +332,9 @@ def api_cargar_notas(registro):
     notas_rechazadas = 0
 
     try:
-        # Leer archivo raw
         raw_content = archivo.read()
         print(f"📦 Tamaño del archivo: {len(raw_content)} bytes")
 
-        # Intentar diferentes codificaciones
         texto = None
         for encoding in ['utf-8-sig', 'utf-8', 'latin-1', 'cp1252']:
             try:
@@ -359,12 +349,10 @@ def api_cargar_notas(registro):
             print("❌ No se pudo decodificar el archivo")
             return jsonify({"success": False, "error": "No se pudo decodificar el archivo. Usa UTF-8"}), 400
 
-        # Remover BOM si existe
         if texto.startswith('\ufeff'):
             texto = texto[1:]
             print("✅ BOM removido")
 
-        # Parsear XML
         tree = ET.parse(StringIO(texto))
         root = tree.getroot()
         print(f"✅ XML parseado correctamente")
@@ -433,7 +421,7 @@ def api_get_reportes(registro):
 
 
 # ============================================
-# NUEVA RUTA PARA ESTUDIANTES (VER NOTAS)
+# RUTAS PARA ESTUDIANTES (CONSULTAR NOTAS Y HORARIOS)
 # ============================================
 
 @tutor_bp.route("/api/notas/estudiante/<carnet>", methods=["GET"])
@@ -443,24 +431,19 @@ def api_get_notas_estudiante(carnet):
     print("🔍 BUSCANDO NOTAS PARA ESTUDIANTE")
     print(f"Carnet: {carnet}")
 
-    # Buscar en todas las matrices de tutores
     todas_notas = []
 
     for registro_personal, matriz in matrices_notas.items():
-        # Obtener notas del estudiante en esta matriz
         notas_estudiante = matriz.obtener_por_estudiante(carnet)
 
         if notas_estudiante:
             print(f"📌 Notas encontradas en tutor: {registro_personal}")
-            # Obtener información del tutor
             tutor_info = obtener_info_tutor(registro_personal)
             cursos_tutor = obtener_cursos_tutor(registro_personal)
 
             for actividad, nota in notas_estudiante.items():
-                # Determinar a qué curso pertenece esta actividad
                 curso_asignado = None
                 for curso in cursos_tutor:
-                    # Buscar si el estudiante está en ese curso
                     if estudiante_en_curso(carnet, curso["codigo"]):
                         curso_asignado = curso
                         break
@@ -475,8 +458,71 @@ def api_get_notas_estudiante(carnet):
                     "fecha": obtener_fecha_nota(registro_personal, actividad, carnet)
                 })
 
-    # Ordenar por fecha (más reciente primero)
     todas_notas.sort(key=lambda x: x.get("fecha", ""), reverse=True)
-
     print(f"✅ Total notas encontradas: {len(todas_notas)}")
     return jsonify(todas_notas), 200
+
+
+@tutor_bp.route("/api/horarios/todos", methods=["GET"])
+def api_get_todos_horarios():
+    """Obtener todos los horarios de tutoría (para estudiantes)"""
+    todos_horarios = []
+
+    if os.path.exists(HORARIOS_FOLDER):
+        for archivo in os.listdir(HORARIOS_FOLDER):
+            if archivo.endswith('.json'):
+                registro_tutor = archivo.replace('.json', '')
+                try:
+                    with open(os.path.join(HORARIOS_FOLDER, archivo), "r", encoding="utf-8") as f:
+                        horarios = json.load(f)
+                        tutor_info = obtener_info_tutor(registro_tutor)
+                        for h in horarios:
+                            todos_horarios.append({
+                                "curso": h.get("curso"),
+                                "horario_inicio": h.get("horario_inicio"),
+                                "horario_fin": h.get("horario_fin"),
+                                "tutor": tutor_info["nombre"],
+                                "tutor_registro": registro_tutor
+                            })
+                except:
+                    pass
+
+    return jsonify(todos_horarios), 200
+
+
+@tutor_bp.route("/api/estudiante/cursos/<carnet>", methods=["GET"])
+def api_get_cursos_estudiante(carnet):
+    """Obtener cursos en los que está inscrito un estudiante"""
+    cursos = []
+
+    if os.path.exists(XML_PATH):
+        try:
+            tree = ET.parse(XML_PATH)
+            root = tree.getroot()
+
+            for ec in root.findall("asignaciones/c_estudiante/estudiante_curso"):
+                if ec.text == carnet:
+                    codigo_curso = ec.get("codigo")
+                    for curso in root.findall("cursos/curso"):
+                        if curso.get("codigo") == codigo_curso:
+                            cursos.append({
+                                "codigo": codigo_curso,
+                                "nombre": curso.text.strip() if curso.text else codigo_curso
+                            })
+                            break
+        except Exception as e:
+            print(f"Error al obtener cursos del estudiante: {e}")
+
+    return jsonify(cursos), 200
+
+
+@tutor_bp.route("/api/estudiante/tareas/<carnet>", methods=["GET"])
+def api_get_tareas_estudiante(carnet):
+    """Obtener tareas pendientes del estudiante (placeholder)"""
+    return jsonify([]), 200
+
+
+@tutor_bp.route("/api/anuncios", methods=["GET"])
+def api_get_anuncios():
+    """Obtener anuncios generales (placeholder)"""
+    return jsonify([]), 200

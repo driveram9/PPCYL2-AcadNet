@@ -1,0 +1,22 @@
+[
+  {
+    "curso": "770",
+    "horario_inicio": "08:00",
+    "horario_fin": "10:00"
+  },
+  {
+    "curso": "770",
+    "horario_inicio": "14:00",
+    "horario_fin": "16:00"
+  },
+  {
+    "curso": "771",
+    "horario_inicio": "10:00",
+    "horario_fin": "12:00"
+  },
+  {
+    "curso": "771",
+    "horario_inicio": "15:00",
+    "horario_fin": "17:00"
+  }
+]

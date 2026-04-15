@@ -391,7 +391,19 @@
     document.getElementById('exportarPDF')?.addEventListener('click', () => {
         const element = document.getElementById('reportes');
         html2pdf().from(element).save();
-    });
+
+    document.getElementById('btnCerrarSesion')?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await fetch('/logout/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken }
+                });
+                window.location.href = '/';
+            } catch (error) {
+                window.location.href = '/';
+            }
+        });
 </script>
 
 </body>

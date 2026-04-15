@@ -8,6 +8,7 @@
         <curso codigo="772">Quimica General</curso>
         <curso codigo="773">Programacion I</curso>
         <curso codigo="774">Algebra Lineal</curso>
+	<curso codigo="516">Programacion II</curso>
     </cursos>
 
     <tutores>
@@ -37,13 +38,14 @@
         <estudiante carnet="118" contrasenia="ar118">Alejandro Ruiz</estudiante>
         <estudiante carnet="119" contrasenia="pa119">Patricia Aguilar</estudiante>
         <estudiante carnet="120" contrasenia="jr120">Jorge Ramirez</estudiante>
+        <estudiante carnet="121" contrasenia="ca121">Carlos Arias</estudiante>
     </estudiantes>
 
     <asignaciones>
         <c_tutores>
             <!-- Juan Perez (registro: 201) da estos cursos -->
             <tutor_curso codigo="770">201</tutor_curso>
-            <tutor_curso codigo="771">201</tutor_curso>
+            <tutor_curso codigo="516">201</tutor_curso>
 
             <!-- Maria Lopez (registro: 202) da estos cursos -->
             <tutor_curso codigo="772">202</tutor_curso>
@@ -74,6 +76,8 @@
             <estudiante_curso codigo="772">118</estudiante_curso>
             <estudiante_curso codigo="773">119</estudiante_curso>
             <estudiante_curso codigo="774">120</estudiante_curso>
+            <estudiante_curso codigo="516">121</estudiante_curso>
+
         </c_estudiante>
     </asignaciones>
 </configuraciones>

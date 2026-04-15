@@ -11,12 +11,17 @@
         <horario_fin>16:00</horario_fin>
     </horario>
     <horario>
-        <curso>771</curso>
+        <curso>516</curso>
         <horario_inicio>10:00</horario_inicio>
         <horario_fin>12:00</horario_fin>
     </horario>
     <horario>
-        <curso>771</curso>
+        <curso>516</curso>
+        <horario_inicio>15:00</horario_inicio>
+        <horario_fin>17:00</horario_fin>
+    </horario>
+    <horario>
+        <curso>516</curso>
         <horario_inicio>15:00</horario_inicio>
         <horario_fin>17:00</horario_fin>
     </horario>

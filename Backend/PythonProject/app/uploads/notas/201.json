@@ -56,24 +56,24 @@
     }
   },
   "filas": [
-    "Examen Parcial 1",
-    "Laboratorio 1",
-    "Proyecto Física",
     "Examen Parcial 2",
     "Examen Teórico",
-    "Proyecto Final",
-    "Laboratorio 2",
+    "Tarea 1",
+    "Examen Parcial 1",
+    "Laboratorio 1",
     "Examen Final",
-    "Tarea 1"
+    "Proyecto Física",
+    "Proyecto Final",
+    "Laboratorio 2"
   ],
   "columnas": [
-    "112",
-    "116",
     "111",
     "117",
-    "101",
-    "103",
     "104",
-    "102"
+    "103",
+    "116",
+    "112",
+    "102",
+    "101"
   ]
 }

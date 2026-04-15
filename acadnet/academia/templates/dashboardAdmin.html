@@ -83,7 +83,6 @@
             </div>
         </div>
 
-        <!-- Sección: Editar XML -->
         <div id="editar" class="section" style="display:none;">
             <h3>✏️ Editar XML Cargado</h3>
             <button id="btnCargarXmlEditar" style="background:#17a2b8;">📂 Cargar XML actual</button>
@@ -95,9 +94,6 @@
 </section>
 
 <script>
-    // ============================================
-    // AL CARGAR LA PÁGINA - Mostrar sección Cursos
-    // ============================================
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.section').forEach(section => {
             section.style.display = 'none';
@@ -106,9 +102,6 @@
         cargarCursos();
     });
 
-    // ============================================
-    // MENÚ - CAMBIO DE SECCIONES
-    // ============================================
     document.querySelectorAll('[data-section]').forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault();
@@ -127,9 +120,6 @@
         });
     });
 
-    // ============================================
-    // UTILIDAD: Mostrar mensajes
-    // ============================================
     function mostrarMensaje(divId, mensaje, esError = false) {
         const div = document.getElementById(divId);
         if (div) {
@@ -138,9 +128,6 @@
         }
     }
 
-    // ============================================
-    // CARGAR CURSOS
-    // ============================================
     async function cargarCursos() {
         const container = document.getElementById('cursosLista');
         container.innerHTML = '<div style="text-align:center; padding:20px;">Cargando cursos...</div>';
@@ -162,9 +149,6 @@
         }
     }
 
-    // ============================================
-    // CARGAR TUTORES
-    // ============================================
     async function cargarTutores() {
         const container = document.getElementById('tutoresLista');
         container.innerHTML = '<div style="text-align:center; padding:20px;">Cargando tutores...</div>';
@@ -186,9 +170,6 @@
         }
     }
 
-    // ============================================
-    // CARGAR ESTUDIANTES
-    // ============================================
     async function cargarEstudiantes() {
         const container = document.getElementById('estudiantesLista');
         container.innerHTML = '<div style="text-align:center; padding:20px;">Cargando estudiantes...</div>';
@@ -210,9 +191,6 @@
         }
     }
 
-    // ============================================
-    // SUBIR XML
-    // ============================================
     document.getElementById('btnSubirXml')?.addEventListener('click', async () => {
         const fileInput = document.getElementById('fileXml');
         const file = fileInput.files[0];
@@ -240,9 +218,6 @@
         }
     });
 
-    // ============================================
-    // PROCESAR XML (generar salida)
-    // ============================================
     const salidaContainer = document.getElementById('salidaXmlContainer');
     const salidaTextarea = document.getElementById('salidaXml');
     document.getElementById('btnProcesarXml')?.addEventListener('click', async () => {
@@ -281,9 +256,6 @@
         URL.revokeObjectURL(url);
     });
 
-    // ============================================
-    // LIMPIAR XML
-    // ============================================
     document.getElementById('btnLimpiarXml')?.addEventListener('click', async () => {
         if (!confirm('⚠️ ¿Estás seguro de que deseas eliminar TODOS los datos? Esta acción no se puede deshacer.')) return;
         try {
@@ -303,9 +275,6 @@
         }
     });
 
-    // ============================================
-    // EDITAR XML
-    // ============================================
     const editor = document.getElementById('xmlEditor');
     const btnGuardar = document.getElementById('btnGuardarXml');
     document.getElementById('btnCargarXmlEditar')?.addEventListener('click', async () => {

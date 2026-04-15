@@ -12,14 +12,12 @@ def login_view(request):
         usuario = request.POST.get('usuario')
         contrasenia = request.POST.get('contrasenia')
 
-        # Admin local
         if usuario == "AdminPPCYL2" and contrasenia == "AdminPPCYL2771":
             request.session['rol'] = 'admin'
             request.session['nombre'] = 'Administrador del Sistema'
             request.session['usuario'] = usuario
             return redirect('admin_dashboard')
 
-        # Consultar backend
         try:
             response = requests.post(f"{BACKEND_URL}/login", json={"usuario": usuario, "contrasenia": contrasenia},
                                      timeout=5)

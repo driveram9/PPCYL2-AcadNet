@@ -125,13 +125,35 @@
             <canvas id="graficoTop" width="400" height="200" style="margin-top:30px;"></canvas>
             <button id="exportarPDF">📄 Exportar a PDF</button>
         </div>
+
+        <div id="configuraciones" class="section" style="display:none;">
+          <h3>Configuraciones</h3>
+    
+          <div class="config-section" id="apuntes">
+            <h4>Apuntes</h4>
+            <textarea placeholder="Escribe tus apuntes aquí..."></textarea>
+          </div>
+    
+          <div class="config-section" id="ayuda">
+            <h4>Ayuda</h4>
+            <p>¿Necesitas soporte? Aquí puedes encontrar guías y preguntas frecuentes.</p>
+            <button>Ver Guía</button>
+            <button>Preguntas Frecuentes</button>
+          </div>
+    
+          <div class="config-section" id="modo">
+            <h4>Modo de visualización</h4>
+            <label for="toggle-modo">Cambiar a modo oscuro:</label>
+            <input type="checkbox" id="toggle-modo">
+          </div>
+        </div>
+      </main>
+    </section>
     </main>
 </section>
 
 <script>
-    // ============================================
-    // AL CARGAR LA PÁGINA - Mostrar sección Horarios
-    // ============================================
+
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.section').forEach(section => {
             section.style.display = 'none';
@@ -139,9 +161,6 @@
         document.getElementById('horarios').style.display = 'block';
     });
 
-    // ============================================
-    // MENÚ - CAMBIO DE SECCIONES
-    // ============================================
     document.querySelectorAll('[data-section]').forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault();
@@ -159,9 +178,6 @@
         });
     });
 
-    // ============================================
-    // FUNCIÓN: CARGAR HORARIOS DESDE BACKEND
-    // ============================================
     async function cargarHorarios() {
         const tbody = document.querySelector('#tablaHorarios tbody');
         tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">Cargando horarios...</td></tr>';
@@ -192,9 +208,6 @@
         cargarHorarios();
     });
 
-    // ============================================
-    // FUNCIÓN: SUBIR HORARIOS (XML)
-    // ============================================
     document.getElementById('btnSubirHorarios')?.addEventListener('click', async () => {
         const fileInput = document.getElementById('fileHorarios');
         const file = fileInput.files[0];
@@ -232,9 +245,6 @@
         }
     });
 
-    // ============================================
-    // FUNCIÓN: LIMPIAR TODOS LOS HORARIOS (NUEVO)
-    // ============================================
     document.getElementById('btnLimpiarHorarios')?.addEventListener('click', async () => {
         if (confirm('⚠️ ¿Estás seguro de que deseas eliminar TODOS tus horarios? Esta acción no se puede deshacer.')) {
             try {
@@ -255,9 +265,6 @@
         }
     });
 
-    // ============================================
-    // FUNCIÓN: SUBIR NOTAS
-    // ============================================
     document.getElementById('btnSubirNotas')?.addEventListener('click', async () => {
         const fileInput = document.getElementById('fileNotas');
         const file = fileInput.files[0];
@@ -295,9 +302,6 @@
         }
     });
 
-    // ============================================
-    // FUNCIÓN: CARGAR REPORTES
-    // ============================================
     let chartPromedios, chartTop;
 
     async function cargarReportes() {
@@ -392,18 +396,9 @@
         const element = document.getElementById('reportes');
         html2pdf().from(element).save();
 
-    document.getElementById('btnCerrarSesion')?.addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
-                await fetch('/logout/', {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': csrfToken }
-                });
-                window.location.href = '/';
-            } catch (error) {
-                window.location.href = '/';
             }
         });
+    
 </script>
 
 </body>
